@@ -1,0 +1,125 @@
+﻿{
+  "version": 3,
+  "configurePresets": [
+    {
+      "name": "windows-base",
+      "hidden": true,
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/out/build/${presetName}",
+      "installDir": "${sourceDir}/out/install/${presetName}",
+      "cacheVariables": {
+        "CMAKE_C_COMPILER": "cl.exe",
+        "CMAKE_CXX_COMPILER": "cl.exe",
+        "CMAKE_C_FLAGS_DEBUG": "/MTd /Zi /Ob0 /Od /RTC1",
+        "CMAKE_CXX_FLAGS_DEBUG": "/MTd /Zi /Ob0 /Od /RTC1",
+        "CMAKE_C_FLAGS_RELEASE": "/MT /Zi /O2 /Ob1 /DNDEBUG",
+        "CMAKE_CXX_FLAGS_RELEASE": "/MT /Zi /O2 /Ob1 /DNDEBUG",
+        "CMAKE_C_FLAGS_MINSIZEREL": "/MT /O1 /Ob1 /DNDEBUG",
+        "CMAKE_CXX_FLAGS_MINSIZEREL": "/MT /O1 /Ob1 /DNDEBUG",
+        "CMAKE_C_FLAGS_RELWITHDEBINFO": "/MT /Zi /O2 /Ob1 /DNDEBUG",
+        "CMAKE_CXX_FLAGS_RELWITHDEBINFO": "/MT /Zi /O2 /Ob1 /DNDEBUG"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      }
+    },
+    {
+      "name": "x64-debug",
+      "displayName": "x64 Debug",
+      "inherits": "windows-base",
+      "architecture": {
+        "value": "x64",
+        "strategy": "external"
+      },
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "x64-release",
+      "displayName": "x64 Release",
+      "inherits": "x64-debug",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
+      "name": "x86-debug",
+      "displayName": "x86 Debug",
+      "inherits": "windows-base",
+      "architecture": {
+        "value": "x86",
+        "strategy": "external"
+      },
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "LITERTP_SSL": true,
+        "OPENSSL_INCLUDE": "E:\\cpp-build\\openssl\\out\\win32\\include",
+        "OPENSSL_LIB_CRYPTO": "E:\\cpp-build\\openssl\\out\\win32\\lib\\libcrypto.lib",
+        "OPENSSL_LIB_SSL": "E:\\cpp-build\\openssl\\out\\win32\\lib\\libssl.lib",
+        "SRTP_INCLUDE": "E:\\cpp-build\\libsrtp\\out\\win32-debug\\include",
+        "SRTP_LIB": "E:\\cpp-build\\libsrtp\\out\\win32-debug\\lib\\srtp2.lib",
+        "JSONCPP_INCLUDE": "E:\\cpp-build\\jsoncpp\\out\\win32-debug\\include",
+        "JSONCPP_LIB": "E:\\cpp-build\\jsoncpp\\out\\win32-debug\\lib\\jsoncpp_static.lib"
+      }
+    },
+    {
+      "name": "x86-release",
+      "displayName": "x86 Release",
+      "inherits": "x86-debug",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "LITERTP_SSL": true,
+        "OPENSSL_INCLUDE": "E:\\cpp-build\\openssl\\out\\win32\\include",
+        "OPENSSL_LIB_CRYPTO": "E:\\cpp-build\\openssl\\out\\win32\\lib\\libcrypto.lib",
+        "OPENSSL_LIB_SSL": "E:\\cpp-build\\openssl\\out\\win32\\lib\\libssl.lib",
+        "SRTP_INCLUDE": "E:\\cpp-build\\libsrtp\\out\\win32-release\\include",
+        "SRTP_LIB": "E:\\cpp-build\\libsrtp\\out\\win32-release\\lib\\srtp2.lib",
+        "JSONCPP_INCLUDE": "E:\\cpp-build\\jsoncpp\\out\\win32-release\\include",
+        "JSONCPP_LIB": "E:\\cpp-build\\jsoncpp\\out\\win32-release\\lib\\jsoncpp_static.lib"
+      }
+    },
+    {
+      "name": "linux-debug",
+      "displayName": "Linux Debug",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/out/build/${presetName}",
+      "installDir": "${sourceDir}/out/install/${presetName}",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      },
+      "vendor": {
+        "microsoft.com/VisualStudioRemoteSettings/CMake/1.0": {
+          "sourceDir": "$env{HOME}/.vs/$ms{projectDirName}"
+        }
+      }
+    },
+    {
+      "name": "macos-debug",
+      "displayName": "macOS Debug",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/out/build/${presetName}",
+      "installDir": "${sourceDir}/out/install/${presetName}",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Darwin"
+      },
+      "vendor": {
+        "microsoft.com/VisualStudioRemoteSettings/CMake/1.0": {
+          "sourceDir": "$env{HOME}/.vs/$ms{projectDirName}"
+        }
+      }
+    }
+  ]
+}
