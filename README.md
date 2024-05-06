@@ -46,8 +46,9 @@ SRTP_LIB=path/to/libsrtp2.lib             # if LITERTP_SSL is ON, this must be s
     -DOPENSSL_LIB_SSL="path/to/libssl.lib" ^
     -DSRTP_INCLUDE="path/to/srtp/include" ^
     -DSRTP_LIB="path/to/libsrtp2.lib"
-    
-    
+
+
+​    
 
 ##### Build for OSX
 
@@ -120,7 +121,7 @@ litertp_global_init()
 And if no longer need, cleanup the library
 
 ```c++
-litertp_global_cleanup
+litertp_global_cleanup()
 ```
 
 ##### Create Offer
@@ -148,6 +149,7 @@ litertp_add_local_attribute(session,media_type_video,96,"fmtp","level-asymmetry-
 litertp_add_local_candidate(session,media_type_audio,1,1,"192.168.0.11",50000,2122260223);
 litertp_add_local_candidate(session,media_type_video,2,1,"192.168.0.11",50000,2122260223);
 
+
 //generate sdp to send you remote end
 char* local_sdp=nullptr;
 int sdp_size=0;
@@ -158,7 +160,7 @@ litertp_free(&local_sdp)
 
 ##### Set answer
 
-After get remote sdp via you way.
+After get remote sdp via your way.
 
 ```c++
 litertp_set_remote_sdp(session,sdp,sdp_type_answer);
@@ -170,7 +172,7 @@ litertp_set_remote_sdp(session,sdp,sdp_type_answer);
 
 ##### Create Answer
 
-```
+```c++
 //create session
 litertp_session_t session=litertp_create_session();
 
@@ -202,6 +204,74 @@ int sdp_size=0;
 litertp_create_answer(session,&local_sdp,&sdp_size);
 litertp_free(&local_sdp)
 
+```
+
+
+
+##### SDP
+
+You also can set local sdp for initialize local streams.
+
+```c++
+litertp_set_local_sdp(session,sdp)
+```
+
+This is equivalent to 
+
+```c++
+//set audio capabilities
+litertp_create_media_stream(session,media_type_audio,0,rtp_trans_mode_sendrecv,true,"0.0.0.0",50000,50000);
+litertp_add_local_audio_track(session,codec_type_opus,111,48000,2);
+litertp_add_local_audio_track(session,codec_type_pcma,8,8000,1);
+
+//set video capabilities
+litertp_create_media_stream(session,media_type_video,0,rtp_trans_mode_sendrecv,true,"0.0.0.0",50000,50000);
+litertp_add_local_video_track(session,codec_type_h264,96,90000);
+litertp_add_local_video_track(session,codec_type_vp8,97,90000);
+litertp_add_local_attribute(session,media_type_video,96,"fmtp","level-asymmetry-allowed=1;packetization-mode=1;profile-level-id=42e01f");
+
+//if webrtc,you can add candidates, this only set into sdp, Not going to discover
+litertp_add_local_candidate(session,media_type_audio,1,1,"192.168.0.11",50000,2122260223);
+litertp_add_local_candidate(session,media_type_video,2,1,"192.168.0.11",50000,2122260223);
+```
+
+
+
+
+
+And some transport protocol like h.323, you won't get remote sdp, so you can not call `litertp_set_remote_sdp`
+
+ in this case you need to manually construct remote streams
+
+```c++
+
+//set audio capabilities
+litertp_create_media_stream
+litertp_add_remote_audio_track
+litertp_add_remote_audio_track
+
+//set video capabilities
+litertp_create_media_stream
+litertp_add_remote_video_track
+litertp_add_remote_video_track
+litertp_add_remote_attribute
+
+    
+litertp_set_remote_ssrc
+litertp_set_remote_trans_mode
+litertp_set_remote_mid
+litertp_set_remote_setup
+
+litertp_set_remote_rtp_endpoint
+litertp_set_remote_rtcp_endpoint
+    
+    
+```
+
+This is equivalent to 
+
+```
+litertp_set_remote_sdp
 ```
 
 

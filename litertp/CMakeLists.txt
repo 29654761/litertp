@@ -6,7 +6,8 @@ project ("litertp")
 file(GLOB_RECURSE SRCS *.cpp *.c *.cc)
 
 if(LITERTP_SHARED)
-    add_definitions(-DLITERTP_DLL)
+    add_definitions(-DITERTP_SHARED)
+    add_definitions(-DLITERTP_DEV)
     add_library(${PROJECT_NAME} SHARED ${SRCS})
 
     if(LITERTP_SSL)
@@ -32,6 +33,7 @@ if(LITERTP_SHARED)
 endif()
 
 if(LITERTP_STATIC)
+    add_definitions(-DITERTP_STATIC)
     add_library(${PROJECT_NAME}_s STATIC ${SRCS})
 
 

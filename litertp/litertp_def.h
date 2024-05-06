@@ -13,24 +13,24 @@ extern "C" {
 
 	//#ifdef MSVC
 
-#ifdef _WIN32
-	#ifdef LITERTP_DLL
-		#define LITERTP_API __declspec(dllexport)
+#ifdef LITERTP_SHARED
+	#ifdef _WIN32
+		#ifdef LITERTP_DEV
+			#define LITERTP_API __declspec(dllexport)
+		#else
+			#define LITERTP_API __declspec(dllimport)
+		#endif
+		#define LITERTP_CALL __cdecl
 	#else
-		#define LITERTP_API __declspec(dllimport)
+		#define LITERTP_API
+		#define LITERTP_CALL
 	#endif
-	#define LITERTP_CALL __cdecl
 #else
 	#define LITERTP_API
 	#define LITERTP_CALL
 #endif
 
 
-
-//#else
-//#define LITERTP_API
-//#define LITERTP_CALL
-//#endif //MSVC
 
 #include "avtypes.h"
 
