@@ -6,7 +6,7 @@ project ("litertp")
 file(GLOB_RECURSE SRCS *.cpp *.c *.cc)
 
 if(LITERTP_SHARED)
-    add_definitions(-DITERTP_SHARED)
+    add_definitions(-DLITERTP_SHARED)
     add_definitions(-DLITERTP_DEV)
     add_library(${PROJECT_NAME} SHARED ${SRCS})
 

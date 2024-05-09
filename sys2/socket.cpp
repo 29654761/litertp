@@ -86,6 +86,18 @@ void socket::ep2addr(unsigned short family,const char* ip, int port, sockaddr* a
 	}
 }
 
+void socket::ep2addr(const char* ip, int port, sockaddr* addr)
+{
+	if (is_ipv4(ip))
+	{
+		ep2addr(AF_INET, ip, port, addr);
+	}
+	else if(is_ipv6(ip))
+	{
+		ep2addr(AF_INET6, ip, port, addr);
+	}
+}
+
 
 bool socket::is_big_endian() 
 {
@@ -184,6 +196,38 @@ uint16_t socket::ntoh16(uint16_t v)
 	else {
 		return swap16(v);
 	}
+}
+
+bool socket::is_ipv4(const std::string& ip)
+{
+	int dotcnt = 0;
+	for (int i = 0; i < ip.length(); i++)
+
+	{
+
+		if (ip[i] == '.')
+
+			dotcnt++;
+
+	}
+
+	return dotcnt == 3;
+}
+
+bool socket::is_ipv6(const std::string& ip)
+{
+	int dotcnt = 0;
+	for (int i = 0; i < ip.length(); i++)
+
+	{
+
+		if (ip[i] == ':')
+
+			dotcnt++;
+
+	}
+
+	return dotcnt == 7;
 }
 
 bool socket::get_addresses_byhost(const char* host, std::vector<sockaddr_storage>& addresses)

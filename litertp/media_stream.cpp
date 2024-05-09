@@ -24,7 +24,6 @@
 #include "proto/rtp_source.h"
 
 #include "util/time.h"
-#include "global.h"
 
 #include <sys2/util.h>
 #include <sys2/string_util.h>
@@ -316,18 +315,14 @@ namespace litertp
 	{
 		std::unique_lock<std::shared_mutex> lk(local_sdp_media_mutex_);
 #ifdef LITERTP_SSL
-		if (!transport_rtp_->dtls_)
-		{
-			transport_rtp_->dtls_ = g_instance.get_dtls();
-		}
-		if (transport_rtp_->dtls_)
+		if (transport_rtp_->enable_security(true))
 		{
 			local_sdp_media_.protos_.erase("AVP");
 			local_sdp_media_.protos_.erase("AVPF");
 			local_sdp_media_.protos_.insert("TLS");
 			local_sdp_media_.protos_.insert("SAVPF");
 
-			local_sdp_media_.fingerprint_ = transport_rtp_->dtls_->fingerprint();
+			local_sdp_media_.fingerprint_ = transport_rtp_->fingerprint();
 		}
 #endif
 	}
@@ -341,13 +336,13 @@ namespace litertp
 		local_sdp_media_.protos_.erase("TLS");
 		local_sdp_media_.protos_.insert("AVPF");
 		local_sdp_media_.fingerprint_ = "";
-		if (transport_rtp_ && transport_rtp_->dtls_)
+		if (transport_rtp_)
 		{
-			transport_rtp_->dtls_.reset();
+			transport_rtp_->enable_security(false);
 		}
-		if (transport_rtcp_ && transport_rtcp_->dtls_)
+		if (transport_rtcp_)
 		{
-			transport_rtcp_->dtls_.reset();
+			transport_rtcp_->enable_security(false);
 		}
 #endif
 	}
@@ -1401,6 +1396,11 @@ namespace litertp
 		}
 	}
 
+	static void s_transport_disconnect(void* ctx)
+	{
+		media_stream* p = (media_stream*)ctx;
+		p->litertp_on_tcp_disconnect_.invoke(p->media_type());
+	}
 
 	void media_stream::on_rtcp_app(const rtcp_app* app)
 	{

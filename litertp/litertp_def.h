@@ -64,8 +64,6 @@ extern "C" {
 		rtp_trans_mode_sendrecv = 0x03,
 	}rtp_trans_mode_t;
 
-
-
 	typedef struct _rtp_sender_stats_t
 	{
 		uint32_t ssrc;
@@ -133,6 +131,7 @@ extern "C" {
 	typedef void (*litertp_on_keyframe_required)(void* ctx, uint32_t ssrc, int mode);
 	typedef void (*litertp_on_rtcp_bye)(void* ctx, uint32_t* ssrcs,int ssrc_count,const char* message);
 	typedef void (*litertp_on_rtcp_app)(void* ctx, uint32_t ssrc, uint32_t name, const char* appdata,uint32_t data_size);
+	typedef void (*litertp_on_tcp_disconnect)(void* ctx, media_type_t mt);
 
 #ifdef __cplusplus
 }

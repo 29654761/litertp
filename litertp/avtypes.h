@@ -36,6 +36,8 @@ typedef enum codec_type_t
 	codec_type_mp4a_latm = 6,		// aac rfc-3016
 	codec_type_telephone_event=7,
 	codec_type_cn=8,
+	codec_type_mp2p=9,
+	codec_type_mp2s=10,
 
 	codec_type_h264 = 101,
 	codec_type_h265 = 102,

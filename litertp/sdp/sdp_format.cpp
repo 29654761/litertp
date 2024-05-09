@@ -131,6 +131,14 @@ namespace litertp
 		{
 			return codec_type_ulpfec;
 		}
+		else if (sys::string_util::icasecompare(codec, "MP2P"))
+		{
+			return codec_type_mp2p;
+		}
+		else if (sys::string_util::icasecompare(codec, "MP2S"))
+		{
+			return codec_type_mp2s;
+		}
 		else
 		{
 			return codec_type_unknown;
@@ -198,6 +206,14 @@ namespace litertp
 		else if (codec == codec_type_ulpfec)
 		{
 			return "ulpfec";
+		}
+		else if (codec == codec_type_mp2p)
+		{
+			return "MP2P";
+		}
+		else if (codec == codec_type_mp2s)
+		{
+			return "MP2S";
 		}
 		else
 		{

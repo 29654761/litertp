@@ -98,6 +98,16 @@ LITERTP_API int LITERTP_CALL litertp_set_on_rtcp_app(litertp_session_t* session,
 	return 0;
 }
 
+LITERTP_API int LITERTP_CALL litertp_set_on_rtcp_app(litertp_session_t* session, litertp_on_tcp_disconnect on_disconnect, void* ctx)
+{
+	litertp::rtp_session* sess = (litertp::rtp_session*)session;
+	if (!sess)
+		return -1;
+
+	sess->litertp_on_tcp_disconnect_.clear();
+	sess->litertp_on_tcp_disconnect_.add(on_disconnect, ctx);
+	return 0;
+}
 
 
 LITERTP_API int LITERTP_CALL litertp_create_media_stream(litertp_session_t* session, media_type_t mt, uint32_t ssrc, rtp_trans_mode_t trans_mode, bool security,
@@ -112,7 +122,7 @@ LITERTP_API int LITERTP_CALL litertp_create_media_stream(litertp_session_t* sess
 	auto m = sess->create_media_stream(mt, ssrc, local_address, local_rtp_port, local_rtcp_port);
 	if (!m)
 	{
-		return false;
+		return -1;
 	}
 
 	m->set_local_trans_mode(trans_mode);
@@ -123,6 +133,136 @@ LITERTP_API int LITERTP_CALL litertp_create_media_stream(litertp_session_t* sess
 
 	return 0;
 }
+
+/*
+* @brief rtp over tcp server rfc2326
+*/
+LITERTP_API int LITERTP_CALL litertp_create_media_stream_tcp_server1(litertp_session_t* session, media_type_t mt, uint32_t ssrc, rtp_trans_mode_t trans_mode, bool security,
+	int local_port, char rtp_channel, char rtcp_channel)
+{
+	litertp::rtp_session* sess = (litertp::rtp_session*)session;
+	if (!sess)
+	{
+		return -1;
+	}
+
+	auto m = sess->create_media_stream_tcp_server_1(mt, ssrc,local_port,rtp_channel,rtcp_channel);
+	if (!m)
+	{
+		return -1;
+	}
+
+	m->set_local_trans_mode(trans_mode);
+	if (security)
+	{
+		m->enable_dtls();
+	}
+
+	return 0;
+}
+
+/*
+* @brief rtp over tcp server rfc4571
+*/
+LITERTP_API int LITERTP_CALL litertp_create_media_stream_tcp_server2(litertp_session_t* session, media_type_t mt, uint32_t ssrc, rtp_trans_mode_t trans_mode, bool security,
+	int local_port)
+{
+	litertp::rtp_session* sess = (litertp::rtp_session*)session;
+	if (!sess)
+	{
+		return -1;
+	}
+
+	auto m = sess->create_media_stream_tcp_server_2(mt, ssrc, local_port);
+	if (!m)
+	{
+		return -1;
+	}
+
+	m->set_local_trans_mode(trans_mode);
+	if (security)
+	{
+		m->enable_dtls();
+	}
+
+	return 0;
+}
+
+/*
+* @brief rtp over tcp client rfc2326.
+* call litertp_connect start working.
+*/
+LITERTP_API int LITERTP_CALL litertp_create_media_stream_tcp_client1(litertp_session_t* session, media_type_t mt, uint32_t ssrc, rtp_trans_mode_t trans_mode, bool security,
+	const char* address, int port, char rtp_channel, char rtcp_channel)
+{
+	litertp::rtp_session* sess = (litertp::rtp_session*)session;
+	if (!sess)
+	{
+		return -1;
+	}
+
+	auto m = sess->create_media_stream_tcp_client_1(mt, ssrc, address,port,rtp_channel,rtcp_channel);
+	if (!m)
+	{
+		return -1;
+	}
+
+	m->set_local_trans_mode(trans_mode);
+	if (security)
+	{
+		m->enable_dtls();
+	}
+
+	return 0;
+}
+
+/*
+* @brief rtp over tcp client rfc4571
+* call litertp_connect start working.
+*/
+LITERTP_API int LITERTP_CALL litertp_create_media_stream_tcp_client2(litertp_session_t* session, media_type_t mt, uint32_t ssrc, rtp_trans_mode_t trans_mode, bool security,
+	const char* address, int port)
+{
+	litertp::rtp_session* sess = (litertp::rtp_session*)session;
+	if (!sess)
+	{
+		return -1;
+	}
+
+	auto m = sess->create_media_stream_tcp_client_2(mt, ssrc, address, port);
+	if (!m)
+	{
+		return -1;
+	}
+
+	m->set_local_trans_mode(trans_mode);
+	if (security)
+	{
+		m->enable_dtls();
+	}
+
+	return 0;
+}
+
+/*
+* @brief Call this function when transport is rtp over tcp client
+*/
+LITERTP_API int LITERTP_CALL litertp_connect(litertp_session_t* session, media_type_t mt)
+{
+	litertp::rtp_session* sess = (litertp::rtp_session*)session;
+	if (!sess)
+	{
+		return -1;
+	}
+
+	if (!sess->connect(mt))
+	{
+		return -1;
+	}
+
+	return 0;
+}
+
 
 
 LITERTP_API int LITERTP_CALL litertp_remove_media_stream(litertp_session_t* session, media_type_t mt)

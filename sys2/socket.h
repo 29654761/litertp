@@ -49,6 +49,7 @@ public:
 
 	static void addr2ep(const sockaddr* addr, std::string* ip, int* port);
 	static void ep2addr(unsigned short family, const char* ip, int port, sockaddr* addr);
+	static void ep2addr(const char* ip, int port, sockaddr* addr);
 
 	static bool is_big_endian();
 
@@ -62,6 +63,9 @@ public:
 	static uint64_t ntoh64(uint64_t v);
 	static uint32_t ntoh32(uint32_t v);
 	static uint16_t ntoh16(uint16_t v);
+
+	static bool is_ipv4(const std::string& ip);
+	static bool is_ipv6(const std::string& ip);
 
 	static bool get_addresses_byhost(const char* host, std::vector<sockaddr_storage>& addresses);
 

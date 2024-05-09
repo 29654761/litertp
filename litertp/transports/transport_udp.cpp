@@ -1,45 +1,36 @@
 /**
- * @file transport.cpp
+ * @file transport_udp.cpp
  * @brief
  * @author Shijie Zhou
  * @copyright 2024 Shijie Zhou
  */
 
-#include "transport.h"
-#include "proto/rtcp_header.h"
-#include "log.h"
+#include "transport_udp.h"
+#include "../proto/rtcp_header.h"
+#include "../log.h"
+#include "../global.h"
 
 #include <sys2/util.h>
 
 namespace litertp {
 
-	transport::transport()
+	transport_udp::transport_udp(int port)
 	{
+		port_ = port;
 	}
 
-	transport::~transport()
+	transport_udp::~transport_udp()
 	{
 		stop();
 	}
 
-	bool transport::set_sendbuf_size(int size)
-	{
-		return socket_->set_sendbuf_size(size);
-	}
 
-	bool transport::set_recvbuf_size(int size)
+	bool transport_udp::start()
 	{
-		return socket_->set_recvbuf_size(size);
-	}
-
-	bool transport::start(int port)
-	{
-		if (active_) {
-			return true;
+		if (!transport::start())
+		{
+			return false;
 		}
-		active_ = true;
-
-		port_ = port;
 		
 		socket_ = std::make_shared<sys::socket>();
 		socket_->create_udp_socket(AF_INET);
@@ -55,14 +46,14 @@ namespace litertp {
 		socket_->set_recvbuf_size(1024 * 1024);
 		socket_->set_sendbuf_size(1024 * 1024);
 
-		receiver_ = new std::thread(&transport::run_recever, this);
+		receiver_ = new std::thread(&transport_udp::run_recever, this);
 
 		return true;
 	}
 
-	void transport::stop()
+	void transport_udp::stop()
 	{
-		active_ = false;
+		transport::stop();
 
 		socket_.reset();
 
@@ -86,7 +77,30 @@ namespace litertp {
 #endif
 	}
 
-	bool transport::send_rtp_packet(packet_ptr packet,const sockaddr* addr,int addr_size)
+	bool transport_udp::enable_security(bool enabled)
+	{
+		if (enabled) 
+		{
+			dtls_ = g_instance.get_dtls();
+			return dtls_ != nullptr;
+		}
+		else
+		{
+			dtls_.reset();
+			return true;
+		}
+	}
+
+	std::string transport_udp::fingerprint()const
+	{
+		if (!dtls_)
+		{
+			return "";
+		}
+		return dtls_->fingerprint();
+	}
+
+	bool transport_udp::send_rtp_packet(packet_ptr packet,const sockaddr* addr,int addr_size)
 	{
 		std::string b;
 		b.reserve(2048); // size for srtp
@@ -114,7 +128,7 @@ namespace litertp {
 		return r >= 0;
 	}
 
-	bool transport::send_rtcp_packet(uint8_t* rtcp_data, int size, const sockaddr* addr, int addr_size)
+	bool transport_udp::send_rtcp_packet(uint8_t* rtcp_data, int size, const sockaddr* addr, int addr_size)
 	{
 	#ifdef LITERTP_SSL
 			if (srtp_out_)
@@ -137,7 +151,7 @@ namespace litertp {
 	}
 
 
-	void transport::run_recever()
+	void transport_udp::run_recever()
 	{
 		while (active_)
 		{
@@ -152,7 +166,7 @@ namespace litertp {
 		}
 	}
 
-	void transport::on_data_received_event(const uint8_t* data, int size, const sockaddr* addr, int addr_size)
+	void transport_udp::on_data_received_event(const uint8_t* data, int size, const sockaddr* addr, int addr_size)
 	{
 		auto proto = test_message(data[0]);
 		if (proto == proto_stun)
@@ -173,7 +187,7 @@ namespace litertp {
 
 
 #ifdef LITERTP_SSL
-	void transport::on_dtls(const uint8_t* data, int size, const sockaddr* addr, int addr_size)
+	void transport_udp::on_dtls(const uint8_t* data, int size, const sockaddr* addr, int addr_size)
 	{
 		if (!dtls_)
 		{
@@ -262,7 +276,7 @@ namespace litertp {
 	}
 #endif
 
-	void transport::on_stun_message(const uint8_t* data, int size, const sockaddr* addr, int addr_size)
+	void transport_udp::on_stun_message(const uint8_t* data, int size, const sockaddr* addr, int addr_size)
 	{
 		stun_message msg;
 		uint32_t fp = 0;
@@ -306,7 +320,7 @@ namespace litertp {
 		}
 	}
 
-	void transport::on_rtp_data(const uint8_t* data, int size, const sockaddr* addr, int addr_size)
+	void transport_udp::on_rtp_data(const uint8_t* data, int size, const sockaddr* addr, int addr_size)
 	{
 		int pt = 0;
 		if (this->test_rtcp_packet(data, size, &pt))
@@ -345,7 +359,7 @@ namespace litertp {
 	}
 
 
-	proto_type_t transport::test_message(uint8_t b)
+	proto_type_t transport_udp::test_message(uint8_t b)
 	{
 		if (b > 127 && b < 192) {
 			return proto_rtp;
@@ -361,34 +375,9 @@ namespace litertp {
 		}
 	}
 
-	bool transport::test_rtcp_packet(const uint8_t* data, int size, int* pt)
-	{
-		rtcp_header hdr = { 0 };
-		int ptv = rtcp_header_parse(&hdr, (const uint8_t*)data, size);
-		if (pt)
-		{
-			*pt = ptv;
-		}
-		if (ptv < 0)
-		{
-			return false;
-		}
-		if (ptv == rtcp_packet_type::RTCP_APP ||
-			ptv == rtcp_packet_type::RTCP_BYE ||
-			ptv == rtcp_packet_type::RTCP_RR ||
-			ptv == rtcp_packet_type::RTCP_SR ||
-			ptv == rtcp_packet_type::RTCP_SDES ||
-			ptv == rtcp_packet_type::RTCP_PSFB ||
-			ptv == rtcp_packet_type::RTCP_RTPFB)
-		{
-			return true;
-		}
+	
 
-
-		return false;
-	}
-
-	void transport::send_stun_request(const sockaddr* addr, int addr_size, uint32_t priority)
+	void transport_udp::send_stun_request(const sockaddr* addr, int addr_size, uint32_t priority)
 	{
 		stun_message req;
 		req.type_ = stun_message_type_binding_request;

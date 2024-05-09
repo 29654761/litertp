@@ -44,12 +44,12 @@ namespace litertp
 			return itr->second;
 		}
 
-		auto tp = get_transport(local_rtp_port);
+		auto tp = get_udp_transport(local_rtp_port);
 		if (!tp)
 		{
 			return nullptr;
 		}
-		auto tp2 = get_transport(local_rtcp_port);
+		auto tp2 = get_udp_transport(local_rtcp_port);
 		if (!tp2)
 		{
 			remote_transport(local_rtp_port);
@@ -62,9 +62,147 @@ namespace litertp
 		m->litertp_on_keyframe_required_.add(s_litertp_on_keyframe_required, this);
 		m->litertp_on_rtcp_app_.add(s_litertp_on_rtcp_app, this);
 		m->litertp_on_rtcp_bye_.add(s_litertp_on_rtcp_bye, this);
+		m->litertp_on_tcp_disconnect_.add(s_litertp_on_tcp_disconnect, this);
+
 		streams_.insert(std::make_pair(mt, m));
 
 		return m;
+	}
+
+	media_stream_ptr rtp_session::create_media_stream_tcp_server_1(media_type_t mt, uint32_t ssrc, int local_port, char rtp_channel, char rtcp_channel)
+	{
+		std::unique_lock<std::shared_mutex>lk(streams_mutex_);
+		auto itr = streams_.find(mt);
+		if (itr != streams_.end())
+		{
+			return itr->second;
+		}
+
+		auto tp = get_tcp_server1_transport(local_port,rtp_channel,rtcp_channel);
+		if (!tp)
+		{
+			return nullptr;
+		}
+		
+
+		std::string mid = std::to_string((int)mt);
+		media_stream_ptr m = std::make_shared<media_stream>(mt, ssrc, mid, cname_, ice_ufrag_, ice_pwd_,"0.0.0.0", tp, tp);
+		m->litertp_on_frame_.add(s_litertp_on_frame, this);
+		m->litertp_on_keyframe_required_.add(s_litertp_on_keyframe_required, this);
+		m->litertp_on_rtcp_app_.add(s_litertp_on_rtcp_app, this);
+		m->litertp_on_rtcp_bye_.add(s_litertp_on_rtcp_bye, this);
+		m->litertp_on_tcp_disconnect_.add(s_litertp_on_tcp_disconnect, this);
+		streams_.insert(std::make_pair(mt, m));
+
+		return m;
+	}
+
+	media_stream_ptr rtp_session::create_media_stream_tcp_server_2(media_type_t mt, uint32_t ssrc, int local_port)
+	{
+		std::unique_lock<std::shared_mutex>lk(streams_mutex_);
+		auto itr = streams_.find(mt);
+		if (itr != streams_.end())
+		{
+			return itr->second;
+		}
+
+		auto tp = get_tcp_server2_transport(local_port);
+		if (!tp)
+		{
+			return nullptr;
+		}
+
+
+		std::string mid = std::to_string((int)mt);
+		media_stream_ptr m = std::make_shared<media_stream>(mt, ssrc, mid, cname_, ice_ufrag_, ice_pwd_, "0.0.0.0", tp, tp);
+		m->litertp_on_frame_.add(s_litertp_on_frame, this);
+		m->litertp_on_keyframe_required_.add(s_litertp_on_keyframe_required, this);
+		m->litertp_on_rtcp_app_.add(s_litertp_on_rtcp_app, this);
+		m->litertp_on_rtcp_bye_.add(s_litertp_on_rtcp_bye, this);
+		m->litertp_on_tcp_disconnect_.add(s_litertp_on_tcp_disconnect, this);
+		streams_.insert(std::make_pair(mt, m));
+
+		return m;
+	}
+
+	media_stream_ptr rtp_session::create_media_stream_tcp_client_1(media_type_t mt, uint32_t ssrc, const char* address, int port, char rtp_channel, char rtcp_channel)
+	{
+		std::unique_lock<std::shared_mutex>lk(streams_mutex_);
+		auto itr = streams_.find(mt);
+		if (itr != streams_.end())
+		{
+			return itr->second;
+		}
+
+		auto tp = get_tcp_client1_transport(address,port,rtp_channel,rtcp_channel);
+		if (!tp)
+		{
+			return nullptr;
+		}
+
+
+		std::string mid = std::to_string((int)mt);
+		media_stream_ptr m = std::make_shared<media_stream>(mt, ssrc, mid, cname_, ice_ufrag_, ice_pwd_, "0.0.0.0", tp, tp);
+		m->litertp_on_frame_.add(s_litertp_on_frame, this);
+		m->litertp_on_keyframe_required_.add(s_litertp_on_keyframe_required, this);
+		m->litertp_on_rtcp_app_.add(s_litertp_on_rtcp_app, this);
+		m->litertp_on_rtcp_bye_.add(s_litertp_on_rtcp_bye, this);
+		m->litertp_on_tcp_disconnect_.add(s_litertp_on_tcp_disconnect, this);
+		streams_.insert(std::make_pair(mt, m));
+
+		return m;
+	}
+
+	media_stream_ptr rtp_session::create_media_stream_tcp_client_2(media_type_t mt, uint32_t ssrc, const char* address, int port)
+	{
+		std::unique_lock<std::shared_mutex>lk(streams_mutex_);
+		auto itr = streams_.find(mt);
+		if (itr != streams_.end())
+		{
+			return itr->second;
+		}
+
+		auto tp = get_tcp_client2_transport(address, port);
+		if (!tp)
+		{
+			return nullptr;
+		}
+
+
+		std::string mid = std::to_string((int)mt);
+		media_stream_ptr m = std::make_shared<media_stream>(mt, ssrc, mid, cname_, ice_ufrag_, ice_pwd_, "0.0.0.0", tp, tp);
+		m->litertp_on_frame_.add(s_litertp_on_frame, this);
+		m->litertp_on_keyframe_required_.add(s_litertp_on_keyframe_required, this);
+		m->litertp_on_rtcp_app_.add(s_litertp_on_rtcp_app, this);
+		m->litertp_on_rtcp_bye_.add(s_litertp_on_rtcp_bye, this);
+		m->litertp_on_tcp_disconnect_.add(s_litertp_on_tcp_disconnect, this);
+		streams_.insert(std::make_pair(mt, m));
+
+		return m;
+	}
+
+	bool rtp_session::connect(media_type_t mt)
+	{
+		auto m=get_media_stream(mt);
+		if (!m)
+		{
+			return false;
+		}
+
+		transport_tcp_2326* c1 = dynamic_cast<transport_tcp_2326*>(m->transport_rtp_.get());
+		if (c1&&c1->is_client())
+		{
+			return c1->start();
+		}
+
+		transport_tcp_4571* c2 = dynamic_cast<transport_tcp_4571*>(m->transport_rtp_.get());
+		if (c2 && c2->is_client())
+		{
+			return c2->start();
+		}
+
+		return false;
+
 	}
 
 	media_stream_ptr rtp_session::get_media_stream(media_type_t mt)
@@ -279,7 +417,7 @@ namespace litertp
 
 
 
-	transport_ptr rtp_session::get_transport(int port)
+	transport_ptr rtp_session::get_udp_transport(int port)
 	{
 		{
 			std::shared_lock<std::shared_mutex>lk(transports_mutex_);
@@ -287,14 +425,19 @@ namespace litertp
 			auto itr = transports_.find(port);
 			if (itr != transports_.end())
 			{
+				transport_udp* p = dynamic_cast<transport_udp*>(itr->second.get());
+				if (!p)
+				{
+					return nullptr;
+				}
 				return itr->second;
 			}
 		}
 
 		{
 			std::unique_lock<std::shared_mutex>lk(transports_mutex_);
-			transport_ptr tp = std::make_shared<transport>();
-			if (!tp->start(port))
+			transport_ptr tp = std::make_shared<transport_udp>(port);
+			if (!tp->start())
 			{
 				return nullptr;
 			}
@@ -302,6 +445,114 @@ namespace litertp
 			tp->ice_ufrag_local_ = this->ice_ufrag_;
 			tp->ice_pwd_local_ = this->ice_pwd_;
 
+			transports_.insert(std::make_pair(port, tp));
+			return tp;
+		}
+	}
+
+	transport_ptr rtp_session::get_tcp_server1_transport(int port, char rtp_channel, char rtcp_channel)
+	{
+		{
+			std::shared_lock<std::shared_mutex>lk(transports_mutex_);
+
+			auto itr = transports_.find(port);
+			if (itr != transports_.end())
+			{
+				transport_tcp_2326* p = dynamic_cast<transport_tcp_2326*>(itr->second.get());
+				if (!p)
+				{
+					return nullptr;
+				}
+				return itr->second;
+			}
+		}
+
+		{
+			std::unique_lock<std::shared_mutex>lk(transports_mutex_);
+			transport_ptr tp = std::make_shared<transport_tcp_2326>(port,rtp_channel,rtcp_channel);
+			if (!tp->start())
+			{
+				return nullptr;
+			}
+
+			transports_.insert(std::make_pair(port, tp));
+			return tp;
+		}
+	}
+	transport_ptr rtp_session::get_tcp_server2_transport(int port)
+	{
+		{
+			std::shared_lock<std::shared_mutex>lk(transports_mutex_);
+
+			auto itr = transports_.find(port);
+			if (itr != transports_.end())
+			{
+				transport_tcp_4571* p = dynamic_cast<transport_tcp_4571*>(itr->second.get());
+				if (!p)
+				{
+					return nullptr;
+				}
+				return itr->second;
+			}
+		}
+
+		{
+			std::unique_lock<std::shared_mutex>lk(transports_mutex_);
+			transport_ptr tp = std::make_shared<transport_tcp_4571>(port);
+			if (!tp->start())
+			{
+				return nullptr;
+			}
+
+			transports_.insert(std::make_pair(port, tp));
+			return tp;
+		}
+	}
+	transport_ptr rtp_session::get_tcp_client1_transport(const char* address, int port, char rtp_channel, char rtcp_channel)
+	{
+		{
+			std::shared_lock<std::shared_mutex>lk(transports_mutex_);
+
+			auto itr = transports_.find(port);
+			if (itr != transports_.end())
+			{
+				transport_tcp_2326* p = dynamic_cast<transport_tcp_2326*>(itr->second.get());
+				if (!p)
+				{
+					return nullptr;
+				}
+				return itr->second;
+			}
+		}
+
+		{
+			std::unique_lock<std::shared_mutex>lk(transports_mutex_);
+			transport_ptr tp = std::make_shared<transport_tcp_2326>(port, rtp_channel, rtcp_channel);
+			transports_.insert(std::make_pair(port, tp));
+			return tp;
+		}
+	}
+
+	transport_ptr rtp_session::get_tcp_client2_transport(const char* address, int port)
+	{
+		{
+			std::shared_lock<std::shared_mutex>lk(transports_mutex_);
+
+			auto itr = transports_.find(port);
+			if (itr != transports_.end())
+			{
+				transport_tcp_4571* p = dynamic_cast<transport_tcp_4571*>(itr->second.get());
+				if (!p)
+				{
+					return nullptr;
+				}
+				return itr->second;
+			}
+		}
+
+		{
+			std::unique_lock<std::shared_mutex>lk(transports_mutex_);
+			transport_ptr tp = std::make_shared<transport_tcp_4571>(port);
 			transports_.insert(std::make_pair(port, tp));
 			return tp;
 		}
@@ -344,6 +595,12 @@ namespace litertp
 	{
 		rtp_session* p = (rtp_session*)ctx;
 		p->litertp_on_rtcp_app_.invoke(ssrc, name,appdata,data_size);
+	}
+
+	void rtp_session::s_litertp_on_tcp_disconnect(void* ctx, media_type_t mt)
+	{
+		rtp_session* p = (rtp_session*)ctx;
+		p->litertp_on_tcp_disconnect_.invoke(mt);
 	}
 
 	void rtp_session::run()

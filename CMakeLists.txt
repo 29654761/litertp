@@ -5,8 +5,8 @@ cmake_minimum_required (VERSION 3.8)
 
 project ("litertp")
 
-option(LITERTP_SSL "Build with SSL" OFF)
-option(LITERTP_TEST "Build LiteRTP test" ON)
+option(LITERTP_SSL "Build with SSL" ON)
+option(LITERTP_TEST "Build LiteRTP test" OFF)
 option(LITERTP_SHARED "Build LiteRTP with shared lib" ON)
 option(LITERTP_STATIC "Build LiteRTP with static lib" ON)
 

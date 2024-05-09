@@ -106,8 +106,8 @@ void rtp_test::on_setoffer(std::string s, int& code, std::string& rsp)
 	litertp_add_local_video_track(session_, codec_type_vp8, 126, 90000);
 	litertp_add_local_video_track(session_, codec_type_h264, 125, 90000);
 
-	litertp_add_local_candidate(session_,media_type_audio, 1, 1, "192.168.1.30", 50000, 0x7e7c1eff);
-	litertp_add_local_candidate(session_, media_type_video, 2, 1, "192.168.1.30", 50000, 0x7e7c1eff);
+	litertp_add_local_candidate(session_,media_type_audio, 1, 1, "192.168.0.250", 50000, 0x7e7c1eff);
+	litertp_add_local_candidate(session_, media_type_video, 2, 1, "192.168.0.250", 50000, 0x7e7c1eff);
 
 	litertp_set_remote_sdp(session_, sOffer.c_str(),sdp_type_offer);
 

@@ -89,6 +89,16 @@ LITERTP_API int LITERTP_CALL litertp_set_on_rtcp_bye(litertp_session_t* session,
 LITERTP_API int LITERTP_CALL litertp_set_on_rtcp_app(litertp_session_t* session, litertp_on_rtcp_app on_app, void* ctx);
 
 /**
+ * @brief Set callback function, raised when tcp transport disconnect.
+ *
+ * @param [in] session - Created by litertp_create_session.
+ * @param [in] on_disconnect - A function point to handle.
+ * @param [in] ctx - Context to on_app.
+ * @return - Greater than or equal to 0 is successed, otherwise is failed.
+ */
+LITERTP_API int LITERTP_CALL litertp_set_on_tcp_disconnect(litertp_session_t* session, litertp_on_tcp_disconnect on_disconnect, void* ctx);
+
+/**
  * @brief Create a media stream for rtp session.
  *
  * @param [in] session - Created by litertp_create_session.
@@ -103,6 +113,37 @@ LITERTP_API int LITERTP_CALL litertp_set_on_rtcp_app(litertp_session_t* session,
  */
 LITERTP_API int LITERTP_CALL litertp_create_media_stream(litertp_session_t* session, media_type_t mt, uint32_t ssrc, rtp_trans_mode_t trans_mode, bool security,
 	const char* local_address, int local_rtp_port, int local_rtcp_port);
+
+/*
+* @brief rtp over tcp server rfc2326
+*/
+LITERTP_API int LITERTP_CALL litertp_create_media_stream_tcp_server1(litertp_session_t* session, media_type_t mt, uint32_t ssrc, rtp_trans_mode_t trans_mode, bool security,
+	int local_port, char rtp_channel, char rtcp_channel);
+
+/*
+* @brief rtp over tcp server rfc4571
+*/
+LITERTP_API int LITERTP_CALL litertp_create_media_stream_tcp_server2(litertp_session_t* session, media_type_t mt, uint32_t ssrc, rtp_trans_mode_t trans_mode, bool security,
+	int local_port);
+
+/*
+* @brief rtp over tcp client rfc2326.
+* call litertp_connect start working.
+*/
+LITERTP_API int LITERTP_CALL litertp_create_media_stream_tcp_client1(litertp_session_t* session, media_type_t mt, uint32_t ssrc, rtp_trans_mode_t trans_mode, bool security,
+	const char* address, int port, char rtp_channel, char rtcp_channel);
+
+/*
+* @brief rtp over tcp client rfc4571
+* call litertp_connect start working.
+*/
+LITERTP_API int LITERTP_CALL litertp_create_media_stream_tcp_client2(litertp_session_t* session, media_type_t mt, uint32_t ssrc, rtp_trans_mode_t trans_mode, bool security,
+	const char* address, int port);
+
+/*
+* @brief Call this function when transport is rtp over tcp client
+*/
+LITERTP_API int LITERTP_CALL litertp_connect(litertp_session_t* session, media_type_t mt);
 
 /**
  * @brief Remove a media stream from rtp session.
