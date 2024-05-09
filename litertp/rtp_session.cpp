@@ -86,7 +86,7 @@ namespace litertp
 		
 
 		std::string mid = std::to_string((int)mt);
-		media_stream_ptr m = std::make_shared<media_stream>(mt, ssrc, mid, cname_, ice_ufrag_, ice_pwd_,"0.0.0.0", tp, tp);
+		media_stream_ptr m = std::make_shared<media_stream>(mt, ssrc, mid, cname_, ice_ufrag_, ice_pwd_,"0.0.0.0", tp, tp,true);
 		m->litertp_on_frame_.add(s_litertp_on_frame, this);
 		m->litertp_on_keyframe_required_.add(s_litertp_on_keyframe_required, this);
 		m->litertp_on_rtcp_app_.add(s_litertp_on_rtcp_app, this);
@@ -114,7 +114,7 @@ namespace litertp
 
 
 		std::string mid = std::to_string((int)mt);
-		media_stream_ptr m = std::make_shared<media_stream>(mt, ssrc, mid, cname_, ice_ufrag_, ice_pwd_, "0.0.0.0", tp, tp);
+		media_stream_ptr m = std::make_shared<media_stream>(mt, ssrc, mid, cname_, ice_ufrag_, ice_pwd_, "0.0.0.0", tp, tp, true);
 		m->litertp_on_frame_.add(s_litertp_on_frame, this);
 		m->litertp_on_keyframe_required_.add(s_litertp_on_keyframe_required, this);
 		m->litertp_on_rtcp_app_.add(s_litertp_on_rtcp_app, this);
@@ -142,7 +142,7 @@ namespace litertp
 
 
 		std::string mid = std::to_string((int)mt);
-		media_stream_ptr m = std::make_shared<media_stream>(mt, ssrc, mid, cname_, ice_ufrag_, ice_pwd_, "0.0.0.0", tp, tp);
+		media_stream_ptr m = std::make_shared<media_stream>(mt, ssrc, mid, cname_, ice_ufrag_, ice_pwd_, "0.0.0.0", tp, tp, true);
 		m->litertp_on_frame_.add(s_litertp_on_frame, this);
 		m->litertp_on_keyframe_required_.add(s_litertp_on_keyframe_required, this);
 		m->litertp_on_rtcp_app_.add(s_litertp_on_rtcp_app, this);
@@ -170,7 +170,7 @@ namespace litertp
 
 
 		std::string mid = std::to_string((int)mt);
-		media_stream_ptr m = std::make_shared<media_stream>(mt, ssrc, mid, cname_, ice_ufrag_, ice_pwd_, "0.0.0.0", tp, tp);
+		media_stream_ptr m = std::make_shared<media_stream>(mt, ssrc, mid, cname_, ice_ufrag_, ice_pwd_, "0.0.0.0", tp, tp, true);
 		m->litertp_on_frame_.add(s_litertp_on_frame, this);
 		m->litertp_on_keyframe_required_.add(s_litertp_on_keyframe_required, this);
 		m->litertp_on_rtcp_app_.add(s_litertp_on_rtcp_app, this);

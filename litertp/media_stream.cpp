@@ -32,7 +32,7 @@ namespace litertp
 {
 
 	media_stream::media_stream(media_type_t media_type,uint32_t ssrc, const std::string& mid, const std::string& cname, const std::string& ice_ufrag, const std::string& ice_pwd,
-		const std::string& local_address, transport_ptr transport_rtp, transport_ptr transport_rtcp)
+		const std::string& local_address, transport_ptr transport_rtp, transport_ptr transport_rtcp, bool is_tcp)
 	{
 		local_sdp_media_.media_type_ = media_type;
 		local_sdp_media_.ice_ufrag_= ice_ufrag;
@@ -43,6 +43,11 @@ namespace litertp
 		local_sdp_media_.rtcp_port_ = transport_rtcp->port_;
 		local_sdp_media_.rtp_address_ = local_address;
 		local_sdp_media_.rtp_port_ = transport_rtp->port_;
+		if (is_tcp)
+		{
+			local_sdp_media_.protos_.erase("UDP");
+			local_sdp_media_.protos_.insert("TCP");
+		}
 		cname_ = cname;
 
 

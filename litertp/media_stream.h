@@ -32,7 +32,7 @@ namespace litertp
 	{
 	public:
 		media_stream(media_type_t media_type, uint32_t ssrc,const std::string& mid,const std::string& cname, const std::string& ice_ufrag, const std::string& ice_pwd,
-			const std::string& local_address,transport_ptr transport_rtp, transport_ptr transport_rtcp);
+			const std::string& local_address,transport_ptr transport_rtp, transport_ptr transport_rtcp,bool is_tcp=false);
 		~media_stream();
 
 		void close();
