@@ -128,7 +128,7 @@ namespace litertp {
 		return r >= 0;
 	}
 
-	bool transport_udp::send_rtcp_packet(uint8_t* rtcp_data, int size, const sockaddr* addr, int addr_size)
+	bool transport_udp::send_rtcp_packet(const uint8_t* rtcp_data, int size, const sockaddr* addr, int addr_size)
 	{
 	#ifdef LITERTP_SSL
 			if (srtp_out_)

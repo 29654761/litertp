@@ -34,7 +34,7 @@ std::string stun_message::serialize(int placeholder)const
 	uint16_t type = sys::socket::hton16(type_) & 0x3FFF;
 	s.append((const char*)&type, 2);
 
-	uint16_t len = sys::socket::hton16(data.size() + placeholder);
+	uint16_t len = sys::socket::hton16((uint16_t)(data.size() + placeholder));
 	s.append((const char*)&len, 2);
 
 	uint32_t magic_cookie = sys::socket::hton32(magic_cookie_);

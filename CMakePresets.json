@@ -10,6 +10,7 @@
       "cacheVariables": {
         "CMAKE_C_COMPILER": "cl.exe",
         "CMAKE_CXX_COMPILER": "cl.exe",
+        "LITE_RTP_TEST": "ON",
         "CMAKE_C_FLAGS_DEBUG": "/MTd /Zi /Ob0 /Od /RTC1",
         "CMAKE_CXX_FLAGS_DEBUG": "/MTd /Zi /Ob0 /Od /RTC1",
         "CMAKE_C_FLAGS_RELEASE": "/MT /Zi /O2 /Ob1 /DNDEBUG",
@@ -34,7 +35,15 @@
         "strategy": "external"
       },
       "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Debug"
+        "CMAKE_BUILD_TYPE": "Debug",
+        "LITERTP_SSL": true,
+        "OPENSSL_INCLUDE": "E:\\cxx-build\\openssl\\out\\win64\\include",
+        "OPENSSL_LIB_CRYPTO": "E:\\cxx-build\\openssl\\out\\win64\\lib\\libcrypto.lib",
+        "OPENSSL_LIB_SSL": "E:\\cxx-build\\openssl\\out\\win64\\lib\\libssl.lib",
+        "SRTP_INCLUDE": "E:\\cxx-build\\libsrtp\\out\\x64-debug\\include",
+        "SRTP_LIB": "E:\\cxx-build\\libsrtp\\out\\x64-debug\\lib\\srtp2.lib",
+        "JSONCPP_INCLUDE": "E:\\cxx-build\\jsoncpp\\out\\x64-debug\\include",
+        "JSONCPP_LIB": "E:\\cxx-build\\jsoncpp\\out\\x64-debug\\lib\\jsoncpp_static.lib"
       }
     },
     {
@@ -56,13 +65,13 @@
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
         "LITERTP_SSL": true,
-        "OPENSSL_INCLUDE": "E:\\cpp-build\\openssl\\out\\win32\\include",
-        "OPENSSL_LIB_CRYPTO": "E:\\cpp-build\\openssl\\out\\win32\\lib\\libcrypto.lib",
-        "OPENSSL_LIB_SSL": "E:\\cpp-build\\openssl\\out\\win32\\lib\\libssl.lib",
-        "SRTP_INCLUDE": "E:\\cpp-build\\libsrtp\\out\\win32-debug\\include",
-        "SRTP_LIB": "E:\\cpp-build\\libsrtp\\out\\win32-debug\\lib\\srtp2.lib",
-        "JSONCPP_INCLUDE": "E:\\cpp-build\\jsoncpp\\out\\win32-debug\\include",
-        "JSONCPP_LIB": "E:\\cpp-build\\jsoncpp\\out\\win32-debug\\lib\\jsoncpp_static.lib"
+        "OPENSSL_INCLUDE": "E:\\cxx-build\\openssl\\out\\win32\\include",
+        "OPENSSL_LIB_CRYPTO": "E:\\cxx-build\\openssl\\out\\win32\\lib\\libcrypto.lib",
+        "OPENSSL_LIB_SSL": "E:\\cxx-build\\openssl\\out\\win32\\lib\\libssl.lib",
+        "SRTP_INCLUDE": "E:\\cxx-build\\libsrtp\\out\\win32-debug\\include",
+        "SRTP_LIB": "E:\\cxx-build\\libsrtp\\out\\win32-debug\\lib\\srtp2.lib",
+        "JSONCPP_INCLUDE": "E:\\cxx-build\\jsoncpp\\out\\win32-debug\\include",
+        "JSONCPP_LIB": "E:\\cxx-build\\jsoncpp\\out\\win32-debug\\lib\\jsoncpp_static.lib"
       }
     },
     {
@@ -72,13 +81,13 @@
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
         "LITERTP_SSL": true,
-        "OPENSSL_INCLUDE": "E:\\cpp-build\\openssl\\out\\win32\\include",
-        "OPENSSL_LIB_CRYPTO": "E:\\cpp-build\\openssl\\out\\win32\\lib\\libcrypto.lib",
-        "OPENSSL_LIB_SSL": "E:\\cpp-build\\openssl\\out\\win32\\lib\\libssl.lib",
-        "SRTP_INCLUDE": "E:\\cpp-build\\libsrtp\\out\\win32-release\\include",
-        "SRTP_LIB": "E:\\cpp-build\\libsrtp\\out\\win32-release\\lib\\srtp2.lib",
-        "JSONCPP_INCLUDE": "E:\\cpp-build\\jsoncpp\\out\\win32-release\\include",
-        "JSONCPP_LIB": "E:\\cpp-build\\jsoncpp\\out\\win32-release\\lib\\jsoncpp_static.lib"
+        "OPENSSL_INCLUDE": "E:\\cxx-build\\openssl\\out\\win32\\include",
+        "OPENSSL_LIB_CRYPTO": "E:\\cxx-build\\openssl\\out\\win32\\lib\\libcrypto.lib",
+        "OPENSSL_LIB_SSL": "E:\\cxx-build\\openssl\\out\\win32\\lib\\libssl.lib",
+        "SRTP_INCLUDE": "E:\\cxx-build\\libsrtp\\out\\win32-release\\include",
+        "SRTP_LIB": "E:\\cxx-build\\libsrtp\\out\\win32-release\\lib\\srtp2.lib",
+        "JSONCPP_INCLUDE": "E:\\cxx-build\\jsoncpp\\out\\win32-release\\include",
+        "JSONCPP_LIB": "E:\\cxx-build\\jsoncpp\\out\\win32-release\\lib\\jsoncpp_static.lib"
       }
     },
     {

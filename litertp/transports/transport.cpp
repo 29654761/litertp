@@ -64,6 +64,30 @@ namespace litertp {
 
 		return false;
 	}
+
+	bool transport::receive_rtp_packet(const uint8_t* rtp_packet, int size)
+	{
+		auto pkt = std::make_shared<packet>();
+		if (!pkt->parse(rtp_packet, size)) 
+		{
+			return false;
+		}
+
+		rtp_packet_event_.invoke(socket_, pkt, nullptr, 0);
+		return true;
+	}
+
+	bool transport::receive_rtcp_packet(const uint8_t* rtcp_packet, int size)
+	{
+		rtcp_header hdr = { 0 };
+		int pt = rtcp_header_parse(&hdr, rtcp_packet, size);
+		if (pt >= 0)
+		{
+			return false;
+		}
+		rtcp_packet_event_.invoke(socket_, (uint16_t)pt, rtcp_packet, size, nullptr, 0);
+		return true;
+	}
 }
 
 

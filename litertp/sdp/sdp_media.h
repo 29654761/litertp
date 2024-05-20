@@ -15,7 +15,7 @@ namespace litertp {
 
 	struct ssrc_t
 	{
-		uint32_t ssrc;
+		uint32_t ssrc=0;
 		std::string cname;
 		std::string msid;
 	};

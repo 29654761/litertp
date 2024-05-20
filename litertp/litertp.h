@@ -88,15 +88,6 @@ LITERTP_API int LITERTP_CALL litertp_set_on_rtcp_bye(litertp_session_t* session,
  */
 LITERTP_API int LITERTP_CALL litertp_set_on_rtcp_app(litertp_session_t* session, litertp_on_rtcp_app on_app, void* ctx);
 
-/**
- * @brief Set callback function, raised when tcp transport disconnect.
- *
- * @param [in] session - Created by litertp_create_session.
- * @param [in] on_disconnect - A function point to handle.
- * @param [in] ctx - Context to on_app.
- * @return - Greater than or equal to 0 is successed, otherwise is failed.
- */
-LITERTP_API int LITERTP_CALL litertp_set_on_tcp_disconnect(litertp_session_t* session, litertp_on_tcp_disconnect on_disconnect, void* ctx);
 
 /**
  * @brief Create a media stream for rtp session.
@@ -115,35 +106,19 @@ LITERTP_API int LITERTP_CALL litertp_create_media_stream(litertp_session_t* sess
 	const char* local_address, int local_rtp_port, int local_rtcp_port);
 
 /*
-* @brief rtp over tcp server rfc2326
+* @brief Create a media stream with custom transport.
+* @param [in] session - Created by litertp_create_session.
+* @param [in] mt - Enum media_type_t.
+* @param [in] ssrc - Specify ssrc for local stream, 0 indicate genrate randomly.
+* @param [in] trans_mode - Enum rtp_trans_mode_t
+* @param [in] security - not used
+* @param [in] port - Transport index, this port not used for socket.
+* @param [in] on_send_packet - Callback when transport want to send packet.
+* @param [in] ctx - Context of on_send_packet.
+* @return - Greater than or equal to 0 is successed, otherwise is failed.
 */
-LITERTP_API int LITERTP_CALL litertp_create_media_stream_tcp_server1(litertp_session_t* session, media_type_t mt, uint32_t ssrc, rtp_trans_mode_t trans_mode, bool security,
-	int local_port, char rtp_channel, char rtcp_channel);
-
-/*
-* @brief rtp over tcp server rfc4571
-*/
-LITERTP_API int LITERTP_CALL litertp_create_media_stream_tcp_server2(litertp_session_t* session, media_type_t mt, uint32_t ssrc, rtp_trans_mode_t trans_mode, bool security,
-	int local_port);
-
-/*
-* @brief rtp over tcp client rfc2326.
-* call litertp_connect start working.
-*/
-LITERTP_API int LITERTP_CALL litertp_create_media_stream_tcp_client1(litertp_session_t* session, media_type_t mt, uint32_t ssrc, rtp_trans_mode_t trans_mode, bool security,
-	const char* address, int port, char rtp_channel, char rtcp_channel);
-
-/*
-* @brief rtp over tcp client rfc4571
-* call litertp_connect start working.
-*/
-LITERTP_API int LITERTP_CALL litertp_create_media_stream_tcp_client2(litertp_session_t* session, media_type_t mt, uint32_t ssrc, rtp_trans_mode_t trans_mode, bool security,
-	const char* address, int port);
-
-/*
-* @brief Call this function when transport is rtp over tcp client
-*/
-LITERTP_API int LITERTP_CALL litertp_connect(litertp_session_t* session, media_type_t mt);
+LITERTP_API int LITERTP_CALL litertp_create_media_stream_custom_transport(litertp_session_t* session, media_type_t mt, uint32_t ssrc, rtp_trans_mode_t trans_mode, bool security,
+	int port, litertp_on_send_packet on_send_packet, void* ctx);
 
 /**
  * @brief Remove a media stream from rtp session.
@@ -161,6 +136,18 @@ LITERTP_API int LITERTP_CALL litertp_remove_media_stream(litertp_session_t* sess
  * @return - Greater than or equal to 0 is successed, otherwise is failed.
  */
 LITERTP_API int LITERTP_CALL litertp_clear_media_streams(litertp_session_t* session);
+
+/**
+ * @brief Clear all media streams from rtp session.
+ *
+ * @param [in] session - Created by litertp_create_session.
+ * @param [in] port - Transport index
+ * @param [in] rtp_packet/rtcp_packet - Packet data.
+ * @param [in] size - Size of packet data.
+ * @return - Greater than or equal to 0 is successed, otherwise is failed.
+ */
+LITERTP_API int LITERTP_CALL litertp_receive_rtp_packet(litertp_session_t* session,int port,const uint8_t* rtp_packet,int size);
+LITERTP_API int LITERTP_CALL litertp_receive_rtcp_packet(litertp_session_t* session, int port, const uint8_t* rtcp_packet, int size);
 
 /**
  * @brief Add local video track.
@@ -443,26 +430,17 @@ LITERTP_API int LITERTP_CALL litertp_set_local_sdp(litertp_session_t* session, c
 LITERTP_API int LITERTP_CALL litertp_require_keyframe(litertp_session_t* session);
 
 /**
- * @brief Send a audio frame
+ * @brief Send a audio/video frame
  *
  * @param [in] session - Created by litertp_create_session.
- * @param [in] frame - Audio frame data
+ * @param [in] mt - Enum media_type_t
+ * @param [in] frame - Audio/Video frame data
  * @param [in] size - Size of audio frame data
- * @param [in] duration - Samples of audio frame data
+ * @param [in] duration - Duration of frame data, for audio is Samples,for video usually is 90000/fps
  * @return - Greater than or equal to 0 is successed, otherwise is failed.
  */
-LITERTP_API int LITERTP_CALL litertp_send_audio_frame(litertp_session_t* session,const uint8_t* frame, uint32_t size, uint32_t duration);
+LITERTP_API int LITERTP_CALL litertp_send_frame(litertp_session_t* session,media_type_t mt,const uint8_t* frame, uint32_t size, uint32_t duration);
 
-/**
- * @brief Send a video frame
- *
- * @param [in] session - Created by litertp_create_session.
- * @param [in] frame - Video frame data
- * @param [in] size - Size of Video frame data
- * @param [in] duration - Samples of video frame data.  (eg. 90000/fps)
- * @return - Greater than or equal to 0 is successed, otherwise is failed.
- */
-LITERTP_API int LITERTP_CALL litertp_send_video_frame(litertp_session_t* session,const uint8_t* frame, uint32_t size, uint32_t duration);
 
 /**
  * @brief Get stats info

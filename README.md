@@ -282,7 +282,7 @@ Now you can send and receive media frame.
 
 The received frames will raised from `litertp_on_frame` set by `litertp_set_on_frame_eventhandler`
 
-To send frame call `litertp_send_video_frame`  `litertp_send_audio_frame`
+To send frame call `litertp_send_frame`
 
 
 

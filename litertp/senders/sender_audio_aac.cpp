@@ -42,10 +42,7 @@ namespace litertp
 	bool sender_audio_aac::send_frame_rfc3640(const uint8_t* frame, uint16_t size, uint32_t duration)
 	{
 		packet_ptr pkt = std::make_shared<packet>(format_.payload_type_, ssrc_, seq_, timestamp_);
-		// RFC3551 specifies that for audio the marker bit should always be 0 except for when returning
-		// from silence suppression. For video the marker bit DOES get set to 1 for the last packet
-		// in a frame.
-		pkt->handle_->header->m = 0;
+		pkt->handle_->header->m = 1;
 
 		std::string data;
 		data.reserve(MAX_RTP_PAYLOAD_SIZE);
@@ -74,10 +71,8 @@ namespace litertp
 	bool sender_audio_aac::send_frame_rfc3016(const uint8_t* frame, uint16_t size, uint32_t duration)
 	{
 		packet_ptr pkt = std::make_shared<packet>(format_.payload_type_, ssrc_, seq_, timestamp_);
-		// RFC3551 specifies that for audio the marker bit should always be 0 except for when returning
-		// from silence suppression. For video the marker bit DOES get set to 1 for the last packet
-		// in a frame.
-		pkt->handle_->header->m = 0;
+
+		pkt->handle_->header->m = 1;
 
 		std::string data;
 		data.reserve(MAX_RTP_PAYLOAD_SIZE);

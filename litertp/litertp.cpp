@@ -98,17 +98,6 @@ LITERTP_API int LITERTP_CALL litertp_set_on_rtcp_app(litertp_session_t* session,
 	return 0;
 }
 
-LITERTP_API int LITERTP_CALL litertp_set_on_rtcp_app(litertp_session_t* session, litertp_on_tcp_disconnect on_disconnect, void* ctx)
-{
-	litertp::rtp_session* sess = (litertp::rtp_session*)session;
-	if (!sess)
-		return -1;
-
-	sess->litertp_on_tcp_disconnect_.clear();
-	sess->litertp_on_tcp_disconnect_.add(on_disconnect, ctx);
-	return 0;
-}
-
 
 LITERTP_API int LITERTP_CALL litertp_create_media_stream(litertp_session_t* session, media_type_t mt, uint32_t ssrc, rtp_trans_mode_t trans_mode, bool security,
 	const char* local_address, int local_rtp_port, int local_rtcp_port)
@@ -134,11 +123,8 @@ LITERTP_API int LITERTP_CALL litertp_create_media_stream(litertp_session_t* sess
 	return 0;
 }
 
-/*
-* @brief rtp over tcp server rfc2326
-*/
-LITERTP_API int LITERTP_CALL litertp_create_media_stream_tcp_server1(litertp_session_t* session, media_type_t mt, uint32_t ssrc, rtp_trans_mode_t trans_mode, bool security,
-	int local_port, char rtp_channel, char rtcp_channel)
+LITERTP_API int LITERTP_CALL litertp_create_media_stream_custom_transport(litertp_session_t* session, media_type_t mt, uint32_t ssrc, rtp_trans_mode_t trans_mode, bool security,
+	int port, litertp_on_send_packet on_send_packet, void* ctx)
 {
 	litertp::rtp_session* sess = (litertp::rtp_session*)session;
 	if (!sess)
@@ -146,7 +132,7 @@ LITERTP_API int LITERTP_CALL litertp_create_media_stream_tcp_server1(litertp_ses
 		return -1;
 	}
 
-	auto m = sess->create_media_stream_tcp_server_1(mt, ssrc,local_port,rtp_channel,rtcp_channel);
+	auto m = sess->create_media_stream(mt, ssrc, port, on_send_packet, ctx);
 	if (!m)
 	{
 		return -1;
@@ -156,108 +142,6 @@ LITERTP_API int LITERTP_CALL litertp_create_media_stream_tcp_server1(litertp_ses
 	if (security)
 	{
 		m->enable_dtls();
-	}
-
-	return 0;
-}
-
-/*
-* @brief rtp over tcp server rfc4571
-*/
-LITERTP_API int LITERTP_CALL litertp_create_media_stream_tcp_server2(litertp_session_t* session, media_type_t mt, uint32_t ssrc, rtp_trans_mode_t trans_mode, bool security,
-	int local_port)
-{
-	litertp::rtp_session* sess = (litertp::rtp_session*)session;
-	if (!sess)
-	{
-		return -1;
-	}
-
-	auto m = sess->create_media_stream_tcp_server_2(mt, ssrc, local_port);
-	if (!m)
-	{
-		return -1;
-	}
-
-	m->set_local_trans_mode(trans_mode);
-	if (security)
-	{
-		m->enable_dtls();
-	}
-
-	return 0;
-}
-
-/*
-* @brief rtp over tcp client rfc2326.
-* call litertp_connect start working.
-*/
-LITERTP_API int LITERTP_CALL litertp_create_media_stream_tcp_client1(litertp_session_t* session, media_type_t mt, uint32_t ssrc, rtp_trans_mode_t trans_mode, bool security,
-	const char* address, int port, char rtp_channel, char rtcp_channel)
-{
-	litertp::rtp_session* sess = (litertp::rtp_session*)session;
-	if (!sess)
-	{
-		return -1;
-	}
-
-	auto m = sess->create_media_stream_tcp_client_1(mt, ssrc, address,port,rtp_channel,rtcp_channel);
-	if (!m)
-	{
-		return -1;
-	}
-
-	m->set_local_trans_mode(trans_mode);
-	if (security)
-	{
-		m->enable_dtls();
-	}
-
-	return 0;
-}
-
-/*
-* @brief rtp over tcp client rfc4571
-* call litertp_connect start working.
-*/
-LITERTP_API int LITERTP_CALL litertp_create_media_stream_tcp_client2(litertp_session_t* session, media_type_t mt, uint32_t ssrc, rtp_trans_mode_t trans_mode, bool security,
-	const char* address, int port)
-{
-	litertp::rtp_session* sess = (litertp::rtp_session*)session;
-	if (!sess)
-	{
-		return -1;
-	}
-
-	auto m = sess->create_media_stream_tcp_client_2(mt, ssrc, address, port);
-	if (!m)
-	{
-		return -1;
-	}
-
-	m->set_local_trans_mode(trans_mode);
-	if (security)
-	{
-		m->enable_dtls();
-	}
-
-	return 0;
-}
-
-/*
-* @brief Call this function when transport is rtp over tcp client
-*/
-LITERTP_API int LITERTP_CALL litertp_connect(litertp_session_t* session, media_type_t mt)
-{
-	litertp::rtp_session* sess = (litertp::rtp_session*)session;
-	if (!sess)
-	{
-		return -1;
-	}
-
-	if (!sess->connect(mt))
-	{
-		return -1;
 	}
 
 	return 0;
@@ -287,6 +171,38 @@ LITERTP_API int LITERTP_CALL litertp_clear_media_streams(litertp_session_t* sess
 	}
 
 	sess->clear_media_streams();
+	return 0;
+}
+
+LITERTP_API int LITERTP_CALL litertp_receive_rtp_packet(litertp_session_t* session, int port, const uint8_t* rtp_packet, int size)
+{
+	litertp::rtp_session* sess = (litertp::rtp_session*)session;
+	if (!sess)
+	{
+		return -1;
+	}
+
+	if (!sess->receive_rtp_packet(port, rtp_packet, size))
+	{
+		return -1;
+	}
+
+	return 0;
+}
+
+LITERTP_API int LITERTP_CALL litertp_receive_rtcp_packet(litertp_session_t* session, int port, const uint8_t* rtcp_packet, int size)
+{
+	litertp::rtp_session* sess = (litertp::rtp_session*)session;
+	if (!sess)
+	{
+		return -1;
+	}
+
+	if (!sess->receive_rtcp_packet(port, rtcp_packet, size))
+	{
+		return -1;
+	}
+
 	return 0;
 }
 
@@ -720,7 +636,7 @@ LITERTP_API int LITERTP_CALL litertp_require_keyframe(litertp_session_t* session
 	return 0;
 }
 
-LITERTP_API int LITERTP_CALL litertp_send_audio_frame(litertp_session_t* session,const uint8_t* frame, uint32_t size, uint32_t duration)
+LITERTP_API int LITERTP_CALL litertp_send_frame(litertp_session_t* session, media_type_t mt,const uint8_t* frame, uint32_t size, uint32_t duration)
 {
 	litertp::rtp_session* sess = (litertp::rtp_session*)session;
 	if (!sess)
@@ -728,23 +644,13 @@ LITERTP_API int LITERTP_CALL litertp_send_audio_frame(litertp_session_t* session
 		return -1;
 	}
 
-	if (!sess->send_audio_frame(frame, size, duration))
+	auto m = sess->get_media_stream(mt);
+	if (!m)
 	{
 		return -1;
 	}
 
-	return 0;
-}
-
-LITERTP_API int LITERTP_CALL litertp_send_video_frame(litertp_session_t* session, const uint8_t* frame, uint32_t size, uint32_t duration)
-{
-	litertp::rtp_session* sess = (litertp::rtp_session*)session;
-	if (!sess)
-	{
-		return -1;
-	}
-
-	if (!sess->send_video_frame(frame, size, duration))
+	if (!m->send_frame(frame, size, duration))
 	{
 		return -1;
 	}

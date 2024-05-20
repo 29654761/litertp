@@ -37,7 +37,7 @@ namespace litertp {
 		virtual std::string fingerprint() const;
 
 		virtual bool send_rtp_packet(packet_ptr packet, const sockaddr* addr, int addr_size);
-		virtual bool send_rtcp_packet(uint8_t* rtcp_data, int size, const sockaddr* addr, int addr_size);
+		virtual bool send_rtcp_packet(const uint8_t* rtcp_data, int size, const sockaddr* addr, int addr_size);
 		virtual void send_stun_request(const sockaddr* addr, int addr_size, uint32_t priority);
 
 		
@@ -62,9 +62,9 @@ namespace litertp {
 #ifdef LITERTP_SSL
 		dtls_ptr dtls_;
 		srtp_t srtp_in_ = nullptr;
-		srtp_policy_t srtp_in_policy_;
+		srtp_policy_t srtp_in_policy_ = { ssrc_undefined };
 		srtp_t srtp_out_ = nullptr;
-		srtp_policy_t srtp_out_policy_;
+		srtp_policy_t srtp_out_policy_ = { ssrc_undefined };
 #endif
 	};
 

@@ -8,8 +8,7 @@
 #pragma once
 
 #include "transports/transport_udp.h"
-#include "transports/transport_tcp_2326.h"
-#include "transports/transport_tcp_4571.h"
+#include "transports/transport_custom.h"
 
 #include "senders/sender.h"
 #include "receivers/receiver.h"
@@ -119,7 +118,6 @@ namespace litertp
 		static void s_transport_rtp_packet(void* ctx, std::shared_ptr<sys::socket> skt, packet_ptr packet, const sockaddr* addr, int addr_size);
 		static void s_transport_rtcp_packet(void* ctx, std::shared_ptr<sys::socket> skt, uint16_t pt, const uint8_t* buffer, size_t size, const sockaddr* addr, int addr_size);
 		static void s_transport_stun_message(void* ctx, std::shared_ptr<sys::socket> skt, const stun_message& msg, const sockaddr* addr, int addr_size);
-		static void s_transport_disconnect(void* ctx);
 
 		static void s_rtp_frame_event(void* ctx, uint32_t ssrc, const sdp_format& fmt, const av_frame_t& frame);
 		void on_rtp_frame_event(uint32_t ssrc, const sdp_format& fmt, const av_frame_t& frame);
@@ -162,7 +160,6 @@ namespace litertp
 		sys::callback<litertp_on_keyframe_required> litertp_on_keyframe_required_;
 		sys::callback<litertp_on_rtcp_app> litertp_on_rtcp_app_;
 		sys::callback<litertp_on_rtcp_bye> litertp_on_rtcp_bye_;
-		sys::callback<litertp_on_tcp_disconnect> litertp_on_tcp_disconnect_;
 
 		transport_ptr transport_rtp_;
 		transport_ptr transport_rtcp_;

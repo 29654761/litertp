@@ -131,7 +131,16 @@ extern "C" {
 	typedef void (*litertp_on_keyframe_required)(void* ctx, uint32_t ssrc, int mode);
 	typedef void (*litertp_on_rtcp_bye)(void* ctx, uint32_t* ssrcs,int ssrc_count,const char* message);
 	typedef void (*litertp_on_rtcp_app)(void* ctx, uint32_t ssrc, uint32_t name, const char* appdata,uint32_t data_size);
-	typedef void (*litertp_on_tcp_disconnect)(void* ctx, media_type_t mt);
+
+	/*
+	* @brief Called when custom transport want to send packet
+	* @param ctx - Context for callback.
+	* @param port - Witch port to send.
+	* @param channel - 0 is rtp,1 is rtcp.
+	* @param data - rtp or rtcp data.
+	* @param size - size of data.
+	*/
+	typedef void (*litertp_on_send_packet)(void* ctx,int port, int channel, const uint8_t* data, int size);
 
 #ifdef __cplusplus
 }

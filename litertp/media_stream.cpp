@@ -1401,12 +1401,6 @@ namespace litertp
 		}
 	}
 
-	static void s_transport_disconnect(void* ctx)
-	{
-		media_stream* p = (media_stream*)ctx;
-		p->litertp_on_tcp_disconnect_.invoke(p->media_type());
-	}
-
 	void media_stream::on_rtcp_app(const rtcp_app* app)
 	{
 		litertp_on_rtcp_app_.invoke(app->ssrc, app->name, (const char*)app->app_data, app->app_size);

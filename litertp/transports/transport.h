@@ -48,13 +48,16 @@ namespace litertp {
 		virtual void stop();
 
 		virtual bool send_rtp_packet(packet_ptr packet, const sockaddr* addr, int addr_size) = 0;
-		virtual bool send_rtcp_packet(uint8_t* rtcp_data, int size, const sockaddr* addr, int addr_size) = 0;
+		virtual bool send_rtcp_packet(const uint8_t* rtcp_data, int size, const sockaddr* addr, int addr_size) = 0;
 		virtual void send_stun_request(const sockaddr* addr, int addr_size, uint32_t priority)=0;
 
 		virtual bool enable_security(bool enabled)=0;
 		virtual std::string fingerprint() const= 0;
 
 		bool test_rtcp_packet(const uint8_t* data, int size, int* pt);
+
+		bool receive_rtp_packet(const uint8_t* rtp_packet, int size);
+		bool receive_rtcp_packet(const uint8_t* rtcp_data, int size);
 	public:
 
 		std::recursive_mutex mutex_;
