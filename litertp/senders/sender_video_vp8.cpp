@@ -10,6 +10,8 @@
 #include "sender_video_vp8.h"
 #include "../vpx/vpx_header.h"
 
+#include <string.h>
+
 namespace litertp
 {
     sender_video_vp8::sender_video_vp8(uint32_t ssrc, media_type_t mt, const sdp_format& fmt)

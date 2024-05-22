@@ -14,7 +14,7 @@ namespace litertp
 	class rtp_session
 	{
 	public:
-		rtp_session();
+		rtp_session(bool webrtc);
 		~rtp_session();
 
 		void close();
@@ -69,9 +69,11 @@ namespace litertp
 		sys::signal signal_;
 		std::thread timer_;
 
+		bool webrtc_ = false;
 		std::string cname_;
 		std::string ice_ufrag_;
 		std::string ice_pwd_;
+		std::string ice_options_;
 		
 		std::shared_mutex streams_mutex_;
 		std::map<media_type_t,media_stream_ptr> streams_;

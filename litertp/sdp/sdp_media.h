@@ -61,7 +61,7 @@ namespace litertp {
 
 		std::string ice_ufrag_;
 		std::string ice_pwd_;
-		std::string ice_options_ = "trickle";
+		std::string ice_options_;
 
 		std::string fingerprint_sign_ = "sha-256";
 		std::string fingerprint_;
@@ -70,7 +70,7 @@ namespace litertp {
 		std::string msid_;
 		std::map<int, std::string> extmap_;
 
-		rtp_trans_mode_t trans_mode_ = rtp_trans_mode_sendrecv;
+		rtp_trans_mode_t trans_mode_ = rtp_trans_mode_inactive;
 		sdp_setup_t setup_ = sdp_setup_actpass;
 
 		std::map<int, sdp_format> rtpmap_;

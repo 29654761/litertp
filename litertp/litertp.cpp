@@ -29,9 +29,9 @@ LITERTP_API void LITERTP_CALL litertp_global_cleanup()
 	litertp::g_instance.cleanup();
 }
 
-LITERTP_API litertp_session_t* LITERTP_CALL litertp_create_session()
+LITERTP_API litertp_session_t* LITERTP_CALL litertp_create_session(int webrtc)
 {
-	litertp::rtp_session* sess = new litertp::rtp_session();
+	litertp::rtp_session* sess = new litertp::rtp_session(webrtc);
 
 	return (litertp_session_t*)sess;
 }

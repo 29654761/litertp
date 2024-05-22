@@ -10,6 +10,8 @@
 #include "../litertp_def.h"
 #include "../util/sn.hpp"
 
+#include <string.h>
+
 namespace litertp
 {
 	receiver_audio_aac::receiver_audio_aac(int ssrc, media_type_t mt, const sdp_format& fmt)

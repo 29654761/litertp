@@ -10,12 +10,18 @@
 
 namespace litertp
 {
-	rtp_session::rtp_session():
+	rtp_session::rtp_session(bool webrtc):
 		timer_(&rtp_session::run,this)
 	{
 		cname_= sys::util::random_string(20);
-		ice_ufrag_= sys::util::random_string(5);
-		ice_pwd_ = sys::util::random_string(25);
+
+		webrtc_ = webrtc;
+		if (webrtc_)
+		{
+			ice_ufrag_ = sys::util::random_string(5);
+			ice_pwd_ = sys::util::random_string(25);
+			ice_options_ = "trickle";
+		}
 	}
 
 	rtp_session::~rtp_session()
@@ -57,7 +63,8 @@ namespace litertp
 		}
 
 		std::string mid = std::to_string((int)mt);
-		media_stream_ptr m = std::make_shared<media_stream>(mt, ssrc, mid, cname_, ice_ufrag_, ice_pwd_, local_address, tp, tp2);
+		media_stream_ptr m = std::make_shared<media_stream>(mt, ssrc, mid, cname_,ice_options_, ice_ufrag_, ice_pwd_, local_address, tp, tp2);
+		
 		m->litertp_on_frame_.add(s_litertp_on_frame, this);
 		m->litertp_on_keyframe_required_.add(s_litertp_on_keyframe_required, this);
 		m->litertp_on_rtcp_app_.add(s_litertp_on_rtcp_app, this);
@@ -85,7 +92,7 @@ namespace litertp
 		
 
 		std::string mid = std::to_string((int)mt);
-		media_stream_ptr m = std::make_shared<media_stream>(mt, ssrc, mid, cname_, ice_ufrag_, ice_pwd_,"0.0.0.0", tp, tp,true);
+		media_stream_ptr m = std::make_shared<media_stream>(mt, ssrc, mid, cname_,ice_options_, ice_ufrag_, ice_pwd_,"0.0.0.0", tp, tp,true);
 		m->litertp_on_frame_.add(s_litertp_on_frame, this);
 		m->litertp_on_keyframe_required_.add(s_litertp_on_keyframe_required, this);
 		m->litertp_on_rtcp_app_.add(s_litertp_on_rtcp_app, this);
@@ -176,10 +183,10 @@ namespace litertp
 	std::string rtp_session::create_offer()
 	{
 		litertp::sdp sdp;
-		sdp.v_ = "0";
-		sdp.o_ = "- 5182226097928797395 2 IN IP4 127.0.0.1";
-		sdp.s_ = "-";
-		sdp.t_ = "0 0";
+		if (webrtc_)
+		{
+			sdp.attrs_.push_back(sdp_pair("msid-semantic", "WMS", ":"));
+		}
 		sdp.bundle_ = local_group_bundle();
 		auto streams=get_media_streams();
 		for (auto stream : streams)
@@ -195,10 +202,10 @@ namespace litertp
 	std::string rtp_session::create_answer()
 	{
 		litertp::sdp sdp;
-		sdp.v_ = "0";
-		sdp.o_ = "- 5182226097928797395 2 IN IP4 127.0.0.1";
-		sdp.s_ = "-";
-		sdp.t_ = "0 0";
+		if (webrtc_)
+		{
+			sdp.attrs_.push_back(sdp_pair("msid-semantic", "WMS", ":"));
+		}
 		sdp.bundle_ = local_group_bundle();
 		auto streams = get_media_streams();
 		for (auto stream : streams)

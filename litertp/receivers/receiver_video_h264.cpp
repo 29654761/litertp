@@ -14,6 +14,7 @@
 
 
 #include <sys2/util.h>
+#include <string.h>
 
 namespace litertp
 {

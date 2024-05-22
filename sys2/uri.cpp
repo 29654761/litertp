@@ -1,6 +1,7 @@
 #include "uri.h"
 #include "string_util.h"
 #include <sstream>
+#include <algorithm>
 
 namespace sys {
 

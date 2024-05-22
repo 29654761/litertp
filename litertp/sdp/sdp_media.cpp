@@ -432,18 +432,18 @@ namespace litertp {
 			ss << "a=fingerprint:" << fingerprint_sign_ << " " << fingerprint_ << std::endl;
 		}
 
-		ss << "a=setup:";
+
 		if (setup_ == sdp_setup_active)
 		{
-			ss << "active";
+			ss << "a=setup:active";
 		}
 		else if (setup_ == sdp_setup_actpass)
 		{
-			ss << "actpass";
+			ss << "a=setup:actpass";
 		}
 		else if (setup_ == sdp_setup_passive)
 		{
-			ss << "passive";
+			ss << "a=setup:passive";
 		}
 		ss << std::endl;
 		if (mid_.size() > 0) 

@@ -9,6 +9,7 @@
 #include <iomanip>
 #include <random>
 #include <sstream>
+#include <string.h>
 
 namespace sys {
 

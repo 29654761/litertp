@@ -12,6 +12,8 @@
 #include "../vpx/vpx_header.h"
 #include "../log.h"
 
+#include <string.h>
+
 namespace litertp
 {
 	receiver_video_vp8::receiver_video_vp8(int ssrc, media_type_t mt, const sdp_format& fmt)

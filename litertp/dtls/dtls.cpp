@@ -8,7 +8,8 @@
 
 #include "dtls.h"
 
-
+#include <algorithm>
+#include <string.h>
 #include <assert.h>
 
 #define ONE_YEAR 60*60*24*365

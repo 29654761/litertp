@@ -93,7 +93,7 @@ void rtp_test::on_setoffer(std::string s, int& code, std::string& rsp)
 	
 
 
-	session_ = litertp_create_session();
+	session_ = litertp_create_session(1);
 
 	litertp_set_on_frame_eventhandler(session_, s_litertp_on_frame, this);
 	litertp_set_on_keyframe_required_eventhandler(session_, s_litertp_on_keyframe_required, this);
@@ -136,7 +136,7 @@ void rtp_test::on_setoffer(std::string s, int& code, std::string& rsp)
 
 void rtp_test::on_getoffer(std::string s, int& code, std::string& rsp)
 {
-	session_ = litertp_create_session();
+	session_ = litertp_create_session(1);
 
 	litertp_set_on_frame_eventhandler(session_, s_litertp_on_frame, this);
 	litertp_set_on_keyframe_required_eventhandler(session_, s_litertp_on_keyframe_required, this);

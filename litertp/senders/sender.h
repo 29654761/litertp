@@ -14,8 +14,9 @@
 
 #include<sys2/callback.hpp>
 #include <array>
+#include <mutex>
 #include <shared_mutex>
-
+#include <atomic>
 
 
 namespace litertp
@@ -33,7 +34,6 @@ namespace litertp
 
 		uint32_t ssrc()const { return ssrc_; }
 		const sdp_format& format()const { return format_; }
-		uint32_t now_timestamp();
 
 		uint16_t last_rtp_seq();
 		uint32_t last_rtp_timestamp();
@@ -53,6 +53,9 @@ namespace litertp
 		uint32_t fir_count()const { return fir_count_; }
 		uint32_t pli_count()const { return pli_count_; }
 		uint32_t nack_count()const { return nack_count_; }
+
+	protected:
+		uint32_t now_timestamp();
 	public:
 
 		sys::callback<send_rtp_packet_event> send_rtp_packet_event_;

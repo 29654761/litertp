@@ -7,6 +7,8 @@
 
 
 #include "socket.h"
+#include <string.h>
+
 
 namespace sys{
 

@@ -32,9 +32,10 @@ LITERTP_API void LITERTP_CALL litertp_global_cleanup();
 
 /**
  * @brief Create an rtp session.
+ * @param [in] webrtc - 1 is webrtc session,0 - is normal rtp session
  * @return - a point to rtp session handler,or return nullptr when failed.
  */
-LITERTP_API litertp_session_t* LITERTP_CALL litertp_create_session();
+LITERTP_API litertp_session_t* LITERTP_CALL litertp_create_session(int webrtc);
 
 /**
  * @brief Destory an rtp session.

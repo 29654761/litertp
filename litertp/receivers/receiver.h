@@ -70,7 +70,7 @@ namespace litertp
 		uint32_t last_rtp_timestamp();
 	protected:
 		//get the now ntp convert to rtp timestamp.
-		uint32_t get_now_timestamp();
+		uint32_t now_timestamp();
 		double ms_to_ts(double ms);
 		double ts_to_ms(double ts);
 

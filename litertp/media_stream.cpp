@@ -27,14 +27,16 @@
 
 #include <sys2/util.h>
 #include <sys2/string_util.h>
+#include <string.h>
 
 namespace litertp
 {
 
-	media_stream::media_stream(media_type_t media_type,uint32_t ssrc, const std::string& mid, const std::string& cname, const std::string& ice_ufrag, const std::string& ice_pwd,
+	media_stream::media_stream(media_type_t media_type,uint32_t ssrc, const std::string& mid, const std::string& cname, const std::string& ice_options, const std::string& ice_ufrag, const std::string& ice_pwd,
 		const std::string& local_address, transport_ptr transport_rtp, transport_ptr transport_rtcp, bool is_tcp)
 	{
 		local_sdp_media_.media_type_ = media_type;
+		local_sdp_media_.ice_options_ = ice_options;
 		local_sdp_media_.ice_ufrag_= ice_ufrag;
 		local_sdp_media_.ice_pwd_= ice_pwd;
 		local_sdp_media_.msid_ = sys::util::uuid();
@@ -1276,7 +1278,7 @@ namespace litertp
 			auto bye = rtcp_bye_create();
 			if (rtcp_bye_parse(bye, buffer, size) >= 0)
 			{
-				for (int i = 0; i < bye->header.common.count; i++)
+				for (unsigned int i = 0; i < bye->header.common.count; i++)
 				{
 					if (p->has_remote_ssrc(bye->src_ids[i])) 
 					{

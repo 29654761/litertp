@@ -12,7 +12,7 @@
 #include "../util/nack_pid_bid.h"
 #include "../log.h"
 #include <shared_mutex>
-
+#include <string.h>
 
 namespace litertp
 {
@@ -80,7 +80,7 @@ namespace litertp
 		timestamp_ = pkt->handle_->header->ts;
 
 		rtp_source_update_seq(&rtp_source_, pkt->handle_->header->seq);
-		rtp_source_update_jitter(&rtp_source_, pkt->handle_->header->ts, this->get_now_timestamp());
+		rtp_source_update_jitter(&rtp_source_, pkt->handle_->header->ts, this->now_timestamp());
 
 
 		int idx = pkt->handle_->header->seq % PACKET_BUFFER_SIZE;
@@ -133,7 +133,7 @@ namespace litertp
 
 
 
-	uint32_t receiver::get_now_timestamp()
+	uint32_t receiver::now_timestamp()
 	{
 		double now = litertp::time_util::cur_time() * 1000;
 		double ms = now - first_sec_ * 1000;

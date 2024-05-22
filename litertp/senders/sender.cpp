@@ -10,6 +10,7 @@
 
 #include "../util/time.h"
 #include <sys2/util.h>
+#include <string.h>
 
 namespace litertp
 {
@@ -140,7 +141,6 @@ namespace litertp
 	
 	uint32_t sender::now_timestamp()
 	{
-		std::shared_lock<std::shared_mutex>lk(mutex_);
 		double now = time_util::cur_time();
 		double now_ts = ms_to_ts(now * 1000);
 		uint32_t ts = now_ts - timestamp_now_;

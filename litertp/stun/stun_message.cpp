@@ -11,6 +11,7 @@
 #include <sys2/socket.h>
 #include <sys2/security/crc32.h>
 #include <random>
+#include <string.h>
 
 stun_message::stun_message()
 {

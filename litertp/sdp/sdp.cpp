@@ -69,8 +69,6 @@ namespace litertp {
 			ss << std::endl;
 		}
 
-		ss << "a=msid-semantic: WMS" << std::endl;
-
 		for (auto a : attrs_)
 		{
 			ss << "a=" << a.to_string() << std::endl;

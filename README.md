@@ -128,7 +128,7 @@ litertp_global_cleanup()
 
 ```c++
 //create session
-litertp_session_t session=litertp_create_session();
+litertp_session_t session=litertp_create_session(1); // paramter 1 indicates webrtc rtp
 
 //set event callback
 litertp_set_on_frame_eventhandler(session,onframe,ctx);
@@ -174,7 +174,7 @@ litertp_set_remote_sdp(session,sdp,sdp_type_answer);
 
 ```c++
 //create session
-litertp_session_t session=litertp_create_session();
+litertp_session_t session=litertp_create_session(1); // paramter 1 indicates webrtc rtp
 
 //set event callback
 litertp_set_on_frame_eventhandler(session,onframe,ctx);
@@ -275,6 +275,85 @@ litertp_set_remote_sdp
 ```
 
 
+
+##### Custom transport
+
+Example for supporting `rtsp over tcp`
+
+```C++
+//create session
+litertp_session_t session=litertp_create_session(0);  // paramter 0 indicates normal rtp
+
+//set event callback
+litertp_set_on_frame_eventhandler(session,onframe,ctx);
+litertp_set_on_keyframe_required_eventhandler(session,on_keyframe_required,ctx);
+
+//set audio capabilities
+litertp_create_media_stream_custom_transport(session,media_type_audio,0,rtp_trans_mode_sendrecv,false,
+                                             0,on_send_packet,nullptr);
+litertp_add_local_audio_track(session,codec_type_opus,111,48000,2);
+litertp_add_local_audio_track(session,codec_type_pcma,8,8000,1);
+
+//set video capabilities
+litertp_create_media_stream_custom_transport(session,media_type_video,0,rtp_trans_mode_sendrecv,false,
+                                             1,on_send_packet,nullptr);
+litertp_add_local_video_track(session,codec_type_h264,96,90000);
+litertp_add_local_video_track(session,codec_type_vp8,97,90000);
+litertp_add_local_attribute(session,media_type_video,96,"fmtp","level-asymmetry-allowed=1;packetization-mode=1;profile-level-id=42e01f");
+```
+
+The difference of `litertp_create_media_stream_custom_transport` function is on parameters `port, on_send_packet and ctx` . Custom_transport can not send packet inside, so when it needs to send rtp/rtcp packet, on_send_packet  will be called back, you need to send by youself
+
+```c++
+void on_send_packet(void* ctx, int port, int channel, const uint8_t* data, int size)
+{
+    // magic $
+	char magic = '$';
+	socket_->send(&magic, 1);
+
+    // channel
+	if (port == 0) //audio
+	{
+		if (channel == 0) //rtp
+		{
+			socket_->send(&audio_rtp_channel_, 1);
+		}
+		else if (channel == 1) //rtcp
+		{
+			socket_->send(&audio_rtcp_channel_, 1);
+		}
+	}
+	else if (port == 1) //video
+	{
+		if (channel == 0)//rtp
+		{
+			socket_->send(&video_rtp_channel_, 1);
+		}
+		else if (channel == 1)//rtcp
+		{
+			socket_->send(&video_rtcp_channel_, 1);
+		}
+	}
+
+    // length
+	uint16_t len = (uint16_t)size;
+	len=sys::socket::hton16(len);
+	socket_->send((const char*)&len, 2);
+    
+    // data
+	socket_->send((const char*)data, size);
+
+}
+```
+
+For receiving data, you need to receive data and separate out packet bytes by youself,  Then call
+
+```
+litertp_receive_rtp_packet(session_,port,rtp_data,size)
+litertp_receive_rtcp_packet(session_,port,rtcp_data,size)
+```
+
+This will trigger onframe and other rtcp events like normal transport receive data.
 
 ##### Go
 

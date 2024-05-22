@@ -45,6 +45,7 @@ extern "C" {
 
 	typedef enum sdp_setup_t
 	{
+		stp_setup_none,
 		sdp_setup_actpass,
 		sdp_setup_active,
 		sdp_setup_passive,
@@ -137,10 +138,11 @@ extern "C" {
 	* @param ctx - Context for callback.
 	* @param port - Witch port to send.
 	* @param channel - 0 is rtp,1 is rtcp.
+	* @param mt - Enum media_type_t
 	* @param data - rtp or rtcp data.
 	* @param size - size of data.
 	*/
-	typedef void (*litertp_on_send_packet)(void* ctx,int port, int channel, const uint8_t* data, int size);
+	typedef void (*litertp_on_send_packet)(void* ctx,int port, int channel,const uint8_t* data, int size);
 
 #ifdef __cplusplus
 }
