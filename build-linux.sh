@@ -2,8 +2,8 @@
 ABI=linux
 CONFIG=release
 ROOT_DIR=/cxx-build
-BUILD_DIR=./build/${ABI}
-INSTALL_DIR=./out/${ABI}
+BUILD_DIR=./build/${ABI}-${CONFIG}
+INSTALL_DIR=./out/${ABI}-${CONFIG}
 
 
 mkdir -p ${BUILD_DIR}

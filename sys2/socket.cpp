@@ -77,14 +77,14 @@ void socket::ep2addr(unsigned short family,const char* ip, int port, sockaddr* a
 		sockaddr_in* sin = (sockaddr_in*)addr;
 		sin->sin_family = AF_INET;
 		sin->sin_port = htons(port);
-		inet_pton(AF_INET, ip, &sin->sin_addr);
+		inet_pton(AF_INET, ip?ip:"0.0.0.0", &sin->sin_addr);
 	}
 	else if(family == AF_INET6){
 		sockaddr_in6* sin = (sockaddr_in6*)addr;
 		sin->sin6_family = AF_INET6;
 		sin->sin6_port = htons(port);
 
-		inet_pton(AF_INET6, ip, &sin->sin6_addr);
+		inet_pton(AF_INET6, ip?ip:"::/0", &sin->sin6_addr);
 	}
 }
 

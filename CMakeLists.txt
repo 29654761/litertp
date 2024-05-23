@@ -5,6 +5,8 @@ cmake_minimum_required (VERSION 3.8)
 
 project ("litertp")
 
+
+
 option(LITERTP_SSL "Build with SSL" ON)
 option(LITERTP_TEST "Build LiteRTP test" OFF)
 option(LITERTP_SHARED "Build LiteRTP with shared lib" ON)
@@ -16,6 +18,13 @@ endif()
 
 
 add_definitions(-DNOMINMAX)
+
+
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
 
 include_directories(
     "."
@@ -76,6 +85,6 @@ endif()
 
 install(
     FILES litertp/avtypes.h litertp/litertp_def.h litertp/litertp.h
-    DESTINATION include/litertc
+    DESTINATION include
 )
 
