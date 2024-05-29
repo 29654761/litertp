@@ -113,6 +113,8 @@ namespace litertp
 
 		void get_stats(rtp_stats_t& stats);
 
+		void set_timestamp(uint32_t ms);
+		uint32_t timestamp();
 	private:
 
 		static void s_transport_rtp_packet(void* ctx, std::shared_ptr<sys::socket> skt, packet_ptr packet, const sockaddr* addr, int addr_size);

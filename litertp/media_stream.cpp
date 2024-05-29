@@ -1040,7 +1040,25 @@ namespace litertp
 	}
 
 
+	void media_stream::set_timestamp(uint32_t ms)
+	{
+		std::shared_lock<std::shared_mutex>lk(senders_mutex_);
+		for (auto itr=senders_.begin();itr!=senders_.end();itr++)
+		{
+			itr->second->set_last_rtp_timestamp_ms(ms);
+		}
+	}
 
+	uint32_t media_stream::timestamp()
+	{
+		auto sender=get_default_sender();
+		if (!sender)
+		{
+			return 0;
+		}
+
+		return sender->last_rtp_timestamp_ms();
+	}
 
 
 

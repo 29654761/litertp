@@ -453,6 +453,26 @@ LITERTP_API int LITERTP_CALL litertp_send_frame(litertp_session_t* session,media
  */
 LITERTP_API int LITERTP_CALL litertp_get_stats(litertp_session_t* session, media_type_t mt, rtp_stats_t* stats);
 
+/**
+ * @brief Set media rtp base timestamp
+ *
+ * @param [in] session - Created by litertp_create_session.
+ * @param [in] mt - Enum media_type_t
+ * @param [out] ms -  Timestamp for millisecond.
+ * @return - Greater than or equal to 0 is successed, otherwise is failed.
+ */
+LITERTP_API int LITERTP_CALL litertp_set_timestamp(litertp_session_t* session, media_type_t mt, uint32_t ms);
+
+/**
+ * @brief Get media rtp base timestamp
+ *
+ * @param [in] session - Created by litertp_create_session.
+ * @param [in] mt - Enum media_type_t
+ * @return - Current rtp timestamp.
+ */
+LITERTP_API uint32_t LITERTP_CALL litertp_get_timestamp(litertp_session_t* session, media_type_t mt);
+
+
 #ifdef __cplusplus
 }
 #endif //__cplusplus

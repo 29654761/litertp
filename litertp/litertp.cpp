@@ -676,3 +676,39 @@ LITERTP_API int LITERTP_CALL litertp_get_stats(litertp_session_t* session, media
 	return 0;
 }
 
+LITERTP_API int LITERTP_CALL litertp_set_timestamp(litertp_session_t* session, media_type_t mt, uint32_t ms)
+{
+	litertp::rtp_session* sess = (litertp::rtp_session*)session;
+	if (!sess)
+	{
+		return -1;
+	}
+
+	litertp::media_stream_ptr m = sess->get_media_stream(mt);
+	if (!m)
+	{
+		return -1;
+	}
+
+	m->set_timestamp(ms);
+	return 0;
+}
+
+
+LITERTP_API uint32_t LITERTP_CALL litertp_get_timestamp(litertp_session_t* session, media_type_t mt)
+{
+	litertp::rtp_session* sess = (litertp::rtp_session*)session;
+	if (!sess)
+	{
+		return -1;
+	}
+
+	litertp::media_stream_ptr m = sess->get_media_stream(mt);
+	if (!m)
+	{
+		return -1;
+	}
+
+	return m->timestamp();
+}
+

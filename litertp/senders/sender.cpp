@@ -66,6 +66,17 @@ namespace litertp
 		return timestamp_now_;
 	}
 
+	uint32_t sender::last_rtp_timestamp_ms()
+	{
+		std::shared_lock<std::shared_mutex>lk(mutex_);
+		return ts_to_ms(this->timestamp_);
+	}
+	void sender::set_last_rtp_timestamp_ms(uint32_t ms)
+	{
+		std::shared_lock<std::shared_mutex>lk(mutex_);
+		this->timestamp_ = ms_to_ts(ms);
+	}
+
 
 	void sender::set_history(packet_ptr packet)
 	{

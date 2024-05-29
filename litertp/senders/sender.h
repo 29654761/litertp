@@ -39,6 +39,9 @@ namespace litertp
 		uint32_t last_rtp_timestamp();
 		double last_timestamp();
 
+		uint32_t last_rtp_timestamp_ms();
+		void set_last_rtp_timestamp_ms(uint32_t ms);
+
 		void set_history(packet_ptr packet);
 		packet_ptr get_history(uint16_t seq);
 
