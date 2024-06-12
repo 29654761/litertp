@@ -33,7 +33,9 @@ namespace litertp
 	{
 		active_ = false;
 		signal_.notify();
-		timer_.join();
+		if (timer_.joinable()) {
+			timer_.join();
+		}
 
 		clear_media_streams();
 		clear_transports();
@@ -69,6 +71,7 @@ namespace litertp
 		m->litertp_on_keyframe_required_.add(s_litertp_on_keyframe_required, this);
 		m->litertp_on_rtcp_app_.add(s_litertp_on_rtcp_app, this);
 		m->litertp_on_rtcp_bye_.add(s_litertp_on_rtcp_bye, this);
+		m->litertp_on_rtcp_report_.add(s_litertp_on_rtcp_report, this);
 
 		streams_.insert(std::make_pair(mt, m));
 
@@ -97,6 +100,7 @@ namespace litertp
 		m->litertp_on_keyframe_required_.add(s_litertp_on_keyframe_required, this);
 		m->litertp_on_rtcp_app_.add(s_litertp_on_rtcp_app, this);
 		m->litertp_on_rtcp_bye_.add(s_litertp_on_rtcp_bye, this);
+		m->litertp_on_rtcp_report_.add(s_litertp_on_rtcp_report, this);
 		streams_.insert(std::make_pair(mt, m));
 
 		return m;
@@ -415,6 +419,12 @@ namespace litertp
 		p->litertp_on_rtcp_app_.invoke(ssrc, name,appdata,data_size);
 	}
 
+	void rtp_session::s_litertp_on_rtcp_report(void* ctx, uint32_t ssrc)
+	{
+		rtp_session* p = (rtp_session*)ctx;
+		p->litertp_on_rtcp_report_.invoke(ssrc);
+	}
+
 	void rtp_session::run()
 	{
 		while (active_)
@@ -425,7 +435,6 @@ namespace litertp
 				m->run_rtcp_stats();
 			}
 
-			
 			signal_.wait(5000);
 		}
 	}

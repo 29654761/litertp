@@ -1452,6 +1452,8 @@ namespace litertp
 			}
 		}
 
+		litertp_on_rtcp_report_.invoke(sr->ssrc);
+
 		LOGT("ssrc %d send report", sr->ssrc);
 	}
 
@@ -1468,7 +1470,7 @@ namespace litertp
 			}
 		}
 
-
+		litertp_on_rtcp_report_.invoke(rr->ssrc);
 		LOGT("ssrc %d receive report", rr->ssrc);
 	}
 

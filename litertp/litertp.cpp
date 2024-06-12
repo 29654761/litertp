@@ -98,6 +98,17 @@ LITERTP_API int LITERTP_CALL litertp_set_on_rtcp_app(litertp_session_t* session,
 	return 0;
 }
 
+LITERTP_API int LITERTP_CALL litertp_set_on_rtcp_report(litertp_session_t* session, litertp_on_rtcp_report on_report, void* ctx)
+{
+	litertp::rtp_session* sess = (litertp::rtp_session*)session;
+	if (!sess)
+		return -1;
+
+	sess->litertp_on_rtcp_report_.clear();
+	sess->litertp_on_rtcp_report_.add(on_report, ctx);
+	return 0;
+}
+
 
 LITERTP_API int LITERTP_CALL litertp_create_media_stream(litertp_session_t* session, media_type_t mt, uint32_t ssrc, rtp_trans_mode_t trans_mode, bool security,
 	const char* local_address, int local_rtp_port, int local_rtcp_port)

@@ -54,7 +54,7 @@ namespace litertp
 		static void s_litertp_on_keyframe_required(void* ctx, uint32_t ssrc, int mode);
 		static void s_litertp_on_rtcp_bye(void* ctx, uint32_t* ssrcs, int ssrc_count, const char* message);
 		static void s_litertp_on_rtcp_app(void* ctx, uint32_t ssrc, uint32_t name, const char* appdata, uint32_t data_size);
-
+		static void s_litertp_on_rtcp_report(void* ctx, uint32_t ssrc);
 		void run();
 
 		bool local_group_bundle();
@@ -63,6 +63,7 @@ namespace litertp
 		sys::callback<litertp_on_keyframe_required> litertp_on_keyframe_required_;
 		sys::callback<litertp_on_rtcp_app> litertp_on_rtcp_app_;
 		sys::callback<litertp_on_rtcp_bye> litertp_on_rtcp_bye_;
+		sys::callback<litertp_on_rtcp_report> litertp_on_rtcp_report_;
 	private:
 		bool active_ = true;
 		

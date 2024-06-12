@@ -31,25 +31,26 @@ namespace litertp
 	bool cert::create_cert()
 	{
 #ifdef LITERTP_SSL
-		static const int num_bits = 2048;
+		static const int num_bits = 1024;
 		BIGNUM* bne = BN_new();
 		BN_set_word(bne, RSA_F4);
 		RSA* rsa_key = RSA_new();
 		RSA_generate_key_ex(rsa_key, num_bits, bne, NULL);
+		BN_free(bne);
 
 		key_ = EVP_PKEY_new();
 		EVP_PKEY_assign_RSA(key_, rsa_key);
 		cert_ = X509_new();
-		X509_set_version(cert_, 2);
+		//X509_set_version(cert_, 2);
 
 		ASN1_INTEGER_set(X509_get_serialNumber(cert_), 1000); // TODO
-		X509_gmtime_adj(X509_get_notBefore(cert_), -1 * ONE_YEAR);
-		X509_gmtime_adj(X509_get_notAfter(cert_), ONE_YEAR);
+		//X509_gmtime_adj(X509_get_notBefore(cert_), -1 * ONE_YEAR);
+		//X509_gmtime_adj(X509_get_notAfter(cert_), ONE_YEAR);
 		if (!X509_set_pubkey(cert_, key_)) {
 			destroy_cert();
 			return false;
 		}
-
+		/*
 		X509_NAME* cert_name = X509_get_subject_name(cert_);
 
 		const char* name = "litertp";
@@ -60,13 +61,12 @@ namespace litertp
 			destroy_cert();
 			return false;
 		}
-
+		*/
 		if (!X509_sign(cert_, key_, EVP_sha1())) {
 			destroy_cert();
 			return false;
 		}
 
-		BN_free(bne);
 
 		expire_at_= time_util::cur_time();
 		return true;

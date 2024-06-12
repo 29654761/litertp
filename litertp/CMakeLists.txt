@@ -62,6 +62,7 @@ endif()
 if(MSVC)
     target_link_libraries(${PROJECT_NAME} PRIVATE
         ws2_32
+        Crypt32
     )
 else()
     target_link_options(${PROJECT_NAME} PRIVATE

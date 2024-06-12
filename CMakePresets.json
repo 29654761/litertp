@@ -37,9 +37,9 @@
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
         "LITERTP_SSL": true,
-        "OPENSSL_INCLUDE": "E:\\cxx-build\\openssl\\out\\win64\\include",
-        "OPENSSL_LIB_CRYPTO": "E:\\cxx-build\\openssl\\out\\win64\\lib\\libcrypto.lib",
-        "OPENSSL_LIB_SSL": "E:\\cxx-build\\openssl\\out\\win64\\lib\\libssl.lib",
+        "OPENSSL_INCLUDE": "E:\\cxx-build\\openssl\\out\\x64-debug\\include",
+        "OPENSSL_LIB_CRYPTO": "E:\\cxx-build\\openssl\\out\\x64-debug\\lib\\libcrypto.lib",
+        "OPENSSL_LIB_SSL": "E:\\cxx-build\\openssl\\out\\x64-debug\\lib\\libssl.lib",
         "SRTP_INCLUDE": "E:\\cxx-build\\libsrtp\\out\\x64-debug\\include",
         "SRTP_LIB": "E:\\cxx-build\\libsrtp\\out\\x64-debug\\lib\\srtp2.lib",
         "JSONCPP_INCLUDE": "E:\\cxx-build\\jsoncpp\\out\\x64-debug\\include",

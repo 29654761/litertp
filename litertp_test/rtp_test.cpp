@@ -106,8 +106,8 @@ void rtp_test::on_setoffer(std::string s, int& code, std::string& rsp)
 	litertp_add_local_video_track(session_, codec_type_vp8, 126, 90000);
 	litertp_add_local_video_track(session_, codec_type_h264, 125, 90000);
 
-	litertp_add_local_candidate(session_,media_type_audio, 1, 1, "192.168.0.250", 50000, 0x7e7c1eff);
-	litertp_add_local_candidate(session_, media_type_video, 2, 1, "192.168.0.250", 50000, 0x7e7c1eff);
+	litertp_add_local_candidate(session_,media_type_audio, 1, 1, "192.168.0.85", 50000, 0x7e7c1eff);
+	litertp_add_local_candidate(session_, media_type_video, 2, 1, "192.168.0.86", 50000, 0x7e7c1eff);
 
 	litertp_set_remote_sdp(session_, sOffer.c_str(),sdp_type_offer);
 
@@ -147,8 +147,8 @@ void rtp_test::on_getoffer(std::string s, int& code, std::string& rsp)
 	litertp_create_media_stream(session_, media_type_video, 0, rtp_trans_mode_recvonly,true, "0.0.0.0", 50000, 50000);
 	litertp_add_local_video_track(session_, codec_type_vp8, 125, 90000);
 
-	litertp_add_local_candidate(session_, media_type_audio, 1, 1, "192.168.0.60", 50000, 2122260223);
-	litertp_add_local_candidate(session_, media_type_video, 2, 1, "192.168.0.60", 50000, 2122260223);
+	litertp_add_local_candidate(session_, media_type_audio, 1, 1, "192.168.0.85", 50000, 2122260223);
+	litertp_add_local_candidate(session_, media_type_video, 2, 1, "192.168.0.85", 50000, 2122260223);
 	//litertp_add_local_candate(session_, media_type_video,2, 2, "192.168.0.62", 50002, 2122260223);
 
 	char* local_sdp = nullptr;

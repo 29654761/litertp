@@ -91,6 +91,16 @@ LITERTP_API int LITERTP_CALL litertp_set_on_rtcp_app(litertp_session_t* session,
 
 
 /**
+ * @brief Set callback function, raised when rtcp rr or sr received from remote end. This is just used for hearbeat, no data responded,call litertp_get_stats for details.
+ *
+ * @param [in] session - Created by litertp_create_session.
+ * @param [in] on_report - A function point to handle.
+ * @param [in] ctx - Context to on_app.
+ * @return - Greater than or equal to 0 is successed, otherwise is failed.
+ */
+LITERTP_API int LITERTP_CALL litertp_set_on_rtcp_report(litertp_session_t* session, litertp_on_rtcp_report on_report, void* ctx);
+
+/**
  * @brief Create a media stream for rtp session.
  *
  * @param [in] session - Created by litertp_create_session.

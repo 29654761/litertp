@@ -162,6 +162,7 @@ namespace litertp
 		sys::callback<litertp_on_keyframe_required> litertp_on_keyframe_required_;
 		sys::callback<litertp_on_rtcp_app> litertp_on_rtcp_app_;
 		sys::callback<litertp_on_rtcp_bye> litertp_on_rtcp_bye_;
+		sys::callback<litertp_on_rtcp_report> litertp_on_rtcp_report_;
 
 		transport_ptr transport_rtp_;
 		transport_ptr transport_rtcp_;
