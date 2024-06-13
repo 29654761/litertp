@@ -14,7 +14,6 @@
 #include <assert.h>
 
 #define ONE_YEAR 60*60*24*365
-#define RENEW_ONE_YEAR 60*60*24*360
 
 namespace litertp
 {
@@ -44,8 +43,9 @@ namespace litertp
 		//X509_set_version(cert_, 2);
 
 		ASN1_INTEGER_set(X509_get_serialNumber(cert_), 1000); // TODO
-		//X509_gmtime_adj(X509_get_notBefore(cert_), -1 * ONE_YEAR);
-		//X509_gmtime_adj(X509_get_notAfter(cert_), ONE_YEAR);
+		ASN1_TIME* before_time=X509_gmtime_adj(X509_get_notBefore(cert_), -1 * ONE_YEAR*10);
+		ASN1_TIME* after_time=X509_gmtime_adj(X509_get_notAfter(cert_), ONE_YEAR*10);
+
 		if (!X509_set_pubkey(cert_, key_)) {
 			destroy_cert();
 			return false;
@@ -62,13 +62,13 @@ namespace litertp
 			return false;
 		}
 		*/
-		if (!X509_sign(cert_, key_, EVP_sha1())) {
+
+		if (!X509_sign(cert_, key_, EVP_sha256())) {
 			destroy_cert();
 			return false;
 		}
 
-
-		expire_at_= time_util::cur_time();
+		expire_at_ = time_util::cur_time()+ ONE_YEAR * 9;
 		return true;
 #else
 		return false;
@@ -100,7 +100,7 @@ namespace litertp
 		std::string ret;
 		ret.reserve(160);
 		unsigned int size;
-		unsigned char fingerprint[EVP_MAX_MD_SIZE];
+		unsigned char fingerprint[EVP_MAX_MD_SIZE] = { 0 };
 		if (X509_digest(cert_, EVP_sha256(), (unsigned char*)fingerprint, &size) == 0) {
 			return ret;
 		}
@@ -119,13 +119,68 @@ namespace litertp
 #endif
 	}
 
+
 	bool cert::is_timeout()const
 	{
 		long now = time_util::cur_time();
 		if (now >= expire_at_)
 		{
+			return true;
+		}
+		return false;
+	}
+
+	bool cert::export_cert(const std::string& file)
+	{
+#ifdef LITERTP_SSL
+		if (!cert_)
+		{
 			return false;
 		}
+		FILE* fout=fopen(file.c_str(), "wb+");
+		if (!fout)
+		{
+			return false;
+		}
+
+		if (!PEM_write_X509(fout, cert_))
+		{
+			fclose(fout);
+			return false;
+		}
+
+		fflush(fout);
+		fclose(fout);
 		return true;
+#else
+		return false;
+#endif
 	}
+
+	bool cert::export_key(const std::string& file)
+	{
+#ifdef LITERTP_SSL
+		if (!key_)
+		{
+			return false;
+		}
+		FILE* fout = fopen(file.c_str(), "wb+");
+		if (!fout)
+		{
+			return false;
+		}
+		if (!PEM_write_PrivateKey(fout,key_,nullptr,nullptr,0,nullptr,nullptr))
+		{
+			fclose(fout);
+			return false;
+		}
+
+		fflush(fout);
+		fclose(fout);
+		return true;
+#else
+		return false;
+#endif
+	}
+
 }

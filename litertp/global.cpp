@@ -45,6 +45,8 @@ namespace litertp
 			return false;
 		}
 
+		//cert_->export_cert("E:\\cacert.pem");
+		//cert_->export_key("E:\\privkey.pem");
 #endif
 		return true;
 	}

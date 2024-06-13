@@ -27,12 +27,14 @@ namespace litertp
 		void destroy_cert();
 
 		std::string fingerprint()const;
-
 		bool is_timeout()const;
 #ifdef LITERTP_SSL
 		X509* handle() { return cert_; }
 		EVP_PKEY* key() { return key_; }
 #endif
+
+		bool export_cert(const std::string& file);
+		bool export_key(const std::string& file);
 	private:
 		long expire_at_ = 0;
 

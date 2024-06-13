@@ -82,7 +82,11 @@ namespace litertp {
 	{
 		if (enabled) 
 		{
-			dtls_ = g_instance.get_dtls();
+			if (!dtls_)
+			{
+				dtls_ = g_instance.get_dtls();
+			}
+			
 			return dtls_ != nullptr;
 		}
 		else

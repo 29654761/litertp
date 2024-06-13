@@ -331,6 +331,7 @@ namespace litertp
 
 			local_sdp_media_.fingerprint_ = transport_rtp_->fingerprint();
 		}
+		transport_rtcp_->enable_security(true);
 #endif
 	}
 
