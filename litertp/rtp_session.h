@@ -17,7 +17,8 @@ namespace litertp
 		rtp_session(bool webrtc);
 		~rtp_session();
 
-		void close();
+		bool start();
+		void stop();
 
 		media_stream_ptr create_media_stream(media_type_t mt, uint32_t ssrc, const char* local_address, int local_rtp_port, int local_rtcp_port);
 		media_stream_ptr create_media_stream(media_type_t mt, uint32_t ssrc,int port,litertp_on_send_packet on_send_packet,void* ctx);
@@ -68,7 +69,7 @@ namespace litertp
 		bool active_ = true;
 		
 		sys::signal signal_;
-		std::thread timer_;
+		std::shared_ptr<std::thread> timer_;
 
 		bool webrtc_ = false;
 		std::string cname_;

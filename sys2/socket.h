@@ -30,22 +30,49 @@ typedef int SOCKET;
 
 namespace sys {
 
+#ifdef WIN32
+enum class shutdown_how_t
+{
+	sd_rd= SD_RECEIVE,
+	sd_wr= SD_SEND,
+	sd_both= SD_BOTH,
+};
+#else
+enum class shutdown_how_t
+{
+	sd_rd = SHUT_RD,
+	sd_wr = SHUT_WR,
+	sd_both = SHUT_RDWR,
+};
+#endif
 
+class socket;
+
+typedef std::shared_ptr<socket> socket_ptr;
 
 class socket
 {
-private:
-	SOCKET m_socket = 0;
-	sockaddr_storage m_remote_addr = {0};
 public:
-	socket();
+	/// <summary>
+	/// Create new socket handle
+	/// </summary>
+	/// <param name="af">AF_INET,AF_INET6</param>
+	/// <param name="type">SOCK_DGRAM,SOCK_STREAM</param>
+	/// <param name="protocol">IPPROTO_UDP,IPPROTO_TCP</param>
+	socket(int af,int type,int protocol);
+
+	/// <summary>
+	/// Create with exist handle
+	/// </summary>
+	/// <param name="skt"></param>
 	socket(SOCKET skt);
+
 	~socket();
 
 
 
 	static int global_init();
-	static void global_uninit();
+	static void global_cleanup();
 
 	static void addr2ep(const sockaddr* addr, std::string* ip, int* port);
 	static void ep2addr(unsigned short family, const char* ip, int port, sockaddr* addr);
@@ -69,17 +96,18 @@ public:
 
 	static bool get_addresses_byhost(const char* host, std::vector<sockaddr_storage>& addresses);
 
-	bool create_udp_socket(int family);
-	bool create_tcp_socket(int family);
+
+	bool ready();
+	bool shutdown(shutdown_how_t how);
 	void close();
 
-	SOCKET handle()const { return m_socket; }
+	SOCKET handle()const { return socket_; }
 
 	bool connect(const sockaddr* addr, socklen_t addr_size);
 	bool bind(const sockaddr* addr, socklen_t addr_size);
 	bool listen(int q);
 
-	std::shared_ptr<socket> accept();
+	socket_ptr accept();
 
 	int send(const char* buffer, int size);
 	int sendto(const char* buffer, int size, const sockaddr* addr, socklen_t addr_size);
@@ -91,7 +119,7 @@ public:
 	socklen_t remote_addr_size()const;
 	void remote_addr(std::string& addr, int& port);
 	void set_remote_addr(const sockaddr* addr, socklen_t addr_size);
-public:
+
 	bool set_reuseaddr(bool enable);
 	bool get_reuseaddr();
 	bool set_sendbuf_size(int size);
@@ -100,6 +128,11 @@ public:
 	int get_recvbuf_size();
 
 	bool set_timeout(int ms);
+
+
+private:
+	SOCKET socket_ = -1;
+	sockaddr_storage remote_addr_ = { 0 };
 };
 
 
@@ -107,10 +140,10 @@ public:
 class socket_selector
 {
 private:
-	fd_set m_read_set;
-	fd_set m_write_set;
-	fd_set m_error_set;
-	int32_t m_maxfd;
+	fd_set read_set_;
+	fd_set write_set_;
+	fd_set error_set_;
+	int32_t maxfd_;
 public:
 	socket_selector();
 	~socket_selector();

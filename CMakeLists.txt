@@ -48,7 +48,7 @@ endif()
 if(LITERTP_SHARED)
 
     install(TARGETS litertp
-        CONFIGURATIONS Release
+        CONFIGURATIONS ${CMAKE_BUILD_TYPE}
         RUNTIME DESTINATION lib
         LIBRARY DESTINATION lib
         ARCHIVE DESTINATION lib
@@ -60,14 +60,14 @@ if(LITERTP_STATIC)
 
 
     install(TARGETS litertp_s
-        CONFIGURATIONS Release
+        CONFIGURATIONS ${CMAKE_BUILD_TYPE}
         RUNTIME DESTINATION lib
         LIBRARY DESTINATION lib
         ARCHIVE DESTINATION lib
     )
 
     install(TARGETS sys2
-        CONFIGURATIONS Release
+        CONFIGURATIONS ${CMAKE_BUILD_TYPE}
         RUNTIME DESTINATION lib
         LIBRARY DESTINATION lib
         ARCHIVE DESTINATION lib

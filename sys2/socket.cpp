@@ -13,14 +13,19 @@
 namespace sys{
 
 
-socket::socket()
+socket::socket(int af, int type, int protocol)
 {
-	m_socket = 0;
+	socket_ = ::socket(af, type,protocol);
+	if (ready())
+	{
+		int no = 0;
+		setsockopt(socket_, IPPROTO_IPV6, IPV6_V6ONLY, (char*)&no, sizeof(no));
+	}
 }
 
 socket::socket(SOCKET skt)
 {
-	m_socket = skt;
+	socket_ = skt;
 }
 
 socket::~socket()
@@ -42,7 +47,7 @@ int socket::global_init()
 }
 
 
-void socket::global_uninit() 
+void socket::global_cleanup()
 {
 #ifdef _WIN32
 	WSACleanup();
@@ -84,7 +89,19 @@ void socket::ep2addr(unsigned short family,const char* ip, int port, sockaddr* a
 		sin->sin6_family = AF_INET6;
 		sin->sin6_port = htons(port);
 
-		inet_pton(AF_INET6, ip?ip:"::/0", &sin->sin6_addr);
+		if (!ip)
+		{
+			inet_pton(AF_INET6, "::", &sin->sin6_addr);
+		}
+		else 
+		{
+			std::string s = ip;
+			if (is_ipv4(s))
+			{
+				s = "::ffff:" + s;
+			}
+			inet_pton(AF_INET6, s.c_str(), &sin->sin6_addr);
+		}
 	}
 }
 
@@ -202,34 +219,38 @@ uint16_t socket::ntoh16(uint16_t v)
 
 bool socket::is_ipv4(const std::string& ip)
 {
-	int dotcnt = 0;
+	int dotcnt = 0, colon = 0;
 	for (int i = 0; i < ip.length(); i++)
-
 	{
-
 		if (ip[i] == '.')
-
+		{
 			dotcnt++;
-
+		}
+		else if (ip[i] == ':')
+		{
+			colon++;
+		}
 	}
 
-	return dotcnt == 3;
+	return dotcnt == 3 && colon == 0;
 }
 
 bool socket::is_ipv6(const std::string& ip)
 {
-	int dotcnt = 0;
+	int dotcnt = 0, colon = 0;
 	for (int i = 0; i < ip.length(); i++)
-
 	{
-
-		if (ip[i] == ':')
-
+		if (ip[i] == '.')
+		{
 			dotcnt++;
-
+		}
+		else if (ip[i] == ':')
+		{
+			colon++;
+		}
 	}
 
-	return dotcnt == 7;
+	return (colon == 7&& dotcnt==0)||(colon == 3 && dotcnt == 3);
 }
 
 bool socket::get_addresses_byhost(const char* host, std::vector<sockaddr_storage>& addresses)
@@ -250,69 +271,42 @@ bool socket::get_addresses_byhost(const char* host, std::vector<sockaddr_storage
 	return true;
 }
 
-bool socket::create_udp_socket(int family)
+bool socket::shutdown(shutdown_how_t how)
 {
-	if (m_socket > 0)
-		return false;
+#ifdef _WIN32
+	int r=::shutdown(socket_, (int)how);
+	return r >= 0;
+#else
 
-	m_socket = ::socket(family, SOCK_DGRAM, IPPROTO_UDP);
-
-	if (m_socket <= 0)
-	{
-		close();
-		return false;
-	}
-
-	int no = 0;
-	setsockopt(m_socket, IPPROTO_IPV6, IPV6_V6ONLY, (char*)&no, sizeof(no));
-
-	return true;
-}
-bool socket::create_tcp_socket(int family)
-{
-	if (m_socket > 0)
-		return false;
-	
-	m_socket = ::socket(family, SOCK_STREAM, IPPROTO_TCP);
-
-	if (m_socket <= 0)
-	{
-		close();
-		return false;
-	}
-
-	int no = 0;
-	setsockopt(m_socket, IPPROTO_IPV6, IPV6_V6ONLY, (char*)&no, sizeof(no));
-
-	return true;
+#endif
 }
 
 void socket::close()
 {
 #ifdef _WIN32
-	shutdown(m_socket, SD_BOTH);
-	if (m_socket > 0)
-	{
-		closesocket(m_socket);
-	}
+	closesocket(socket_);
 #else
-	shutdown(m_socket, SHUT_RDWR);
-	if (m_socket > 0)
-	{
-		::close(m_socket);
-	}
+	shutdown(shutdown_how_t::sd_both);
+	::close(socket_);
 #endif
-	
-	m_socket = 0;
+}
+
+bool socket::ready()
+{
+#ifdef _WIN32
+	return socket_ != INVALID_SOCKET;
+#else
+	return socket_ >= 0;
+#endif
 }
 
 bool socket::connect(const sockaddr* addr, socklen_t addr_size)
 {
-	if (m_socket <= 0)
+	if (!ready())
 		return false;
 
 	set_remote_addr(addr, addr_size);
-	int r = ::connect(m_socket, addr, addr_size);
+	int r = ::connect(socket_, addr, addr_size);
 	if (r != 0) {
 		return false;
 	}
@@ -321,10 +315,7 @@ bool socket::connect(const sockaddr* addr, socklen_t addr_size)
 }
 bool socket::bind(const sockaddr* addr, socklen_t addr_size)
 {
-	if (m_socket <= 0)
-		return false;
-
-	int r = ::bind(m_socket, addr, addr_size);
+	int r = ::bind(socket_, addr, addr_size);
 	if (r < 0)
 		return false;
 
@@ -332,25 +323,23 @@ bool socket::bind(const sockaddr* addr, socklen_t addr_size)
 }
 bool socket::listen(int q) 
 {
-	if (m_socket <= 0)
-		return false;
-
-	int r = ::listen(m_socket, q);
+	int r = ::listen(socket_, q);
 	if (r < 0)
 		return false;
 
 	return true;
 }
 
-std::shared_ptr<socket> socket::accept()
+socket_ptr socket::accept()
 {
 	sockaddr_storage addr = { 0 };
 	socklen_t addrlen = sizeof(addr);
-	SOCKET skt = ::accept(m_socket, (sockaddr*)&addr, &addrlen);
-	if (skt == -1) {
+	SOCKET skt = ::accept(socket_, (sockaddr*)&addr, &addrlen);
+	auto ptr = std::make_shared<socket>(skt);
+	if (!ptr->ready())
+	{
 		return nullptr;
 	}
-	auto ptr = std::make_shared<socket>(skt);
 	ptr->set_remote_addr((const sockaddr*)&addr, addrlen);
 	return ptr;
 }
@@ -358,45 +347,48 @@ std::shared_ptr<socket> socket::accept()
 
 int socket::send(const char* buffer, int size)
 {
-	return ::send(m_socket, buffer, size, 0);
+	return ::send(socket_, buffer, size, 0);
 }
 int socket::sendto(const char* buffer, int size, const sockaddr* addr, socklen_t addr_size)
 {
-	return ::sendto(m_socket, buffer, size, 0, addr, addr_size);
+	//std::string ip;
+	//int port = 0;
+	//addr2ep(addr, &ip, &port);
+	return ::sendto(socket_, buffer, size, 0, addr, addr_size);
 }
 
 int socket::recv(char* buffer, int size) 
 {
-	return ::recv(m_socket, buffer, size, 0);
+	return ::recv(socket_, buffer, size, 0);
 }
 int socket::recvfrom(char* buffer, int size, sockaddr* addr, socklen_t* addrSize) 
 {
-	return ::recvfrom(m_socket, buffer, size, 0, addr, addrSize);
+	return ::recvfrom(socket_, buffer, size, 0, addr, addrSize);
 }
 
 const sockaddr* socket::remote_addr()const
 {
-	return (const sockaddr*)&m_remote_addr;
+	return (const sockaddr*)&remote_addr_;
 }
 
 socklen_t socket::remote_addr_size()const
 {
-	return sizeof(m_remote_addr);
+	return sizeof(remote_addr_);
 }
 
 void socket::remote_addr(std::string& addr, int& port)
 {
-	addr2ep((const sockaddr*)&m_remote_addr, &addr, &port);
+	addr2ep((const sockaddr*)&remote_addr_, &addr, &port);
 }
 void socket::set_remote_addr(const sockaddr* addr, socklen_t addr_size)
 {
-	memcpy(&m_remote_addr, addr, addr_size);
+	memcpy(&remote_addr_, addr, addr_size);
 }
 
 bool socket::set_reuseaddr(bool enable)
 {
 	int v = enable ? 1 : 0;
-	if (setsockopt(m_socket, SOL_SOCKET, SO_REUSEADDR, (const char*)&v, sizeof(int)) < 0) {
+	if (setsockopt(socket_, SOL_SOCKET, SO_REUSEADDR, (const char*)&v, sizeof(int)) < 0) {
 		return false;
 	}
 	return true;
@@ -406,13 +398,13 @@ bool socket::get_reuseaddr()
 {
 	int v = 0;
 	socklen_t s = sizeof(v);
-	getsockopt(m_socket, SOL_SOCKET, SO_REUSEADDR, (char*)&v, &s);
+	getsockopt(socket_, SOL_SOCKET, SO_REUSEADDR, (char*)&v, &s);
 	return !!v;
 }
 
 bool socket::set_sendbuf_size(int size)
 {
-	if (setsockopt(m_socket, SOL_SOCKET, SO_SNDBUF, (const char*)&size, (socklen_t)sizeof(size)) < 0) {
+	if (setsockopt(socket_, SOL_SOCKET, SO_SNDBUF, (const char*)&size, (socklen_t)sizeof(size)) < 0) {
 		return false;
 	}
 	return true;
@@ -422,7 +414,7 @@ int socket::get_sendbuf_size()
 {
 	int v = 0;
 	socklen_t s = sizeof(v);
-	getsockopt(m_socket, SOL_SOCKET, SO_SNDBUF, (char*)&v, &s);
+	getsockopt(socket_, SOL_SOCKET, SO_SNDBUF, (char*)&v, &s);
 
 
 	return v;
@@ -430,7 +422,7 @@ int socket::get_sendbuf_size()
 
 bool socket::set_recvbuf_size(int size)
 {
-	if (setsockopt(m_socket, SOL_SOCKET, SO_RCVBUF, (const char*)&size, sizeof(size)) < 0) {
+	if (setsockopt(socket_, SOL_SOCKET, SO_RCVBUF, (const char*)&size, sizeof(size)) < 0) {
 		return false;
 	}
 	return true;
@@ -440,7 +432,7 @@ int socket::get_recvbuf_size()
 {
 	int v = 0;
 	socklen_t s = sizeof(v); 
-	getsockopt(m_socket, SOL_SOCKET, SO_RCVBUF, (char*)&v, &s);
+	getsockopt(socket_, SOL_SOCKET, SO_RCVBUF, (char*)&v, &s);
 	return v;
 }
 
@@ -448,7 +440,7 @@ bool socket::set_timeout(int ms)
 {
 #ifdef _WIN32
 	DWORD timeout = ms;
-	int r=setsockopt(m_socket, SOL_SOCKET, SO_RCVTIMEO, (const char*)&timeout, sizeof timeout);
+	int r=setsockopt(socket_, SOL_SOCKET, SO_RCVTIMEO, (const char*)&timeout, sizeof timeout);
 	return r == 0 ? true : false;
 
 
@@ -456,7 +448,7 @@ bool socket::set_timeout(int ms)
 	struct timeval tv;
 	tv.tv_sec = ms / 1000;
 	tv.tv_usec = (ms % 1000) * 1000;
-	int r=setsockopt(m_socket, SOL_SOCKET, SO_RCVTIMEO, (const char*)&tv, sizeof tv);
+	int r=setsockopt(socket_, SOL_SOCKET, SO_RCVTIMEO, (const char*)&tv, sizeof tv);
 	return r == 0 ? true : false;
 #endif
 }
@@ -473,40 +465,40 @@ socket_selector::~socket_selector()
 
 void socket_selector::reset()
 {
-	FD_ZERO(&m_read_set);
-	FD_ZERO(&m_write_set);
-	FD_ZERO(&m_error_set);
-	m_maxfd = 0;
+	FD_ZERO(&read_set_);
+	FD_ZERO(&write_set_);
+	FD_ZERO(&error_set_);
+	maxfd_ = 0;
 }
 
 void socket_selector::add_to_read(SOCKET skt)
 {
-	FD_SET(skt, &m_read_set);
-	if (skt > m_maxfd)
-		m_maxfd = skt;
+	FD_SET(skt, &read_set_);
+	if (skt > maxfd_)
+		maxfd_ = skt;
 }
 
 void socket_selector::add_to_write(SOCKET skt)
 {
-	FD_SET(skt, &m_write_set);
-	if (skt > m_maxfd)
-		m_maxfd = skt;
+	FD_SET(skt, &write_set_);
+	if (skt > maxfd_)
+		maxfd_ = skt;
 }
 
 bool socket_selector::is_readable(SOCKET skt)
 {
-	return FD_ISSET(skt, &m_read_set);
+	return FD_ISSET(skt, &read_set_);
 }
 
 bool socket_selector::is_writeable(SOCKET skt)
 {
-	return FD_ISSET(skt, &m_write_set);
+	return FD_ISSET(skt, &write_set_);
 }
 
 int socket_selector::wait(int32_t sec)
 {
 	timeval tv = { sec,0 };
-	return select(m_maxfd + 1, &m_read_set, &m_write_set, &m_error_set, sec >= 0 ? (&tv) : nullptr);
+	return select(maxfd_ + 1, &read_set_, &write_set_, &error_set_, sec >= 0 ? (&tv) : nullptr);
 }
 
 

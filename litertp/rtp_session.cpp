@@ -10,8 +10,7 @@
 
 namespace litertp
 {
-	rtp_session::rtp_session(bool webrtc):
-		timer_(&rtp_session::run,this)
+	rtp_session::rtp_session(bool webrtc)
 	{
 		cname_= sys::util::random_string(20);
 
@@ -26,15 +25,22 @@ namespace litertp
 
 	rtp_session::~rtp_session()
 	{
-		close();
+		stop();
 	}
 
-	void rtp_session::close()
+	bool rtp_session::start()
+	{
+		timer_ = std::make_shared<std::thread>(&rtp_session::run, this);
+		return true;
+	}
+
+	void rtp_session::stop()
 	{
 		active_ = false;
 		signal_.notify();
-		if (timer_.joinable()) {
-			timer_.join();
+		if (timer_) {
+			timer_->join();
+			timer_.reset();
 		}
 
 		clear_media_streams();

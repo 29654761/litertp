@@ -32,7 +32,7 @@ LITERTP_API void LITERTP_CALL litertp_global_cleanup()
 LITERTP_API litertp_session_t* LITERTP_CALL litertp_create_session(int webrtc)
 {
 	litertp::rtp_session* sess = new litertp::rtp_session(webrtc);
-
+	sess->start();
 	return (litertp_session_t*)sess;
 }
 

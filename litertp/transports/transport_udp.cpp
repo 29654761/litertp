@@ -33,8 +33,7 @@ namespace litertp {
 			return false;
 		}
 		
-		socket_ = std::make_shared<sys::socket>();
-		socket_->create_udp_socket(AF_INET);
+		socket_ = std::make_shared<sys::socket>(AF_INET,SOCK_DGRAM,IPPROTO_UDP);
 
 		sockaddr_in v4 = { 0 };
 		sys::socket::ep2addr(AF_INET,nullptr, port_, (sockaddr*)&v4);

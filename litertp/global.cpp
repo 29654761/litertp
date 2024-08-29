@@ -53,7 +53,7 @@ namespace litertp
 
 	void global::cleanup()
 	{
-		sys::socket::global_uninit();
+		sys::socket::global_cleanup();
 
 #ifdef LITERTP_SSL
 		srtp_shutdown();

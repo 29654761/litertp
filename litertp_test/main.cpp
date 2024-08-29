@@ -3,12 +3,8 @@
 #include <sstream>
 #include "rtp_test.h"
 
-#include <shared_mutex>
-std::shared_mutex mutex;
-
 int main(char** args, int argc)
 {
-
 	litertp_global_init();
 
 	rtp_test test;
