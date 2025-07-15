@@ -1,4 +1,5 @@
 # litertp
+This project is obsolete, Please see https://github.com/29654761/cxx-deps/tree/main/rtpx
 
 ### Introduce
 
